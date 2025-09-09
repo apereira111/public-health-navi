@@ -4,10 +4,36 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DashboardPanel } from "./DashboardPanel";
 import { allPanels } from "@/data/mockdata";
+import { HealthDataService } from "@/services/HealthDataService";
 import type { PanelData } from "@/types";
 
 export const DashboardSelector = () => {
   const [selectedPanel, setSelectedPanel] = useState<PanelData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Função para carregar dados dinâmicos do painel
+  const handlePanelSelect = async (panel: PanelData) => {
+    setIsLoading(true);
+    try {
+      // Mapeia ID do painel para categoria do serviço
+      const categoryMap: Record<string, string> = {
+        'oral-health': 'oral_health',
+        'womens-health': 'womens_health', 
+        'mental-health': 'mental_health',
+        'chronic-diseases': 'chronic_diseases',
+        'epidemiology': 'epidemiology'
+      };
+      
+      const category = categoryMap[panel.id] || 'oral_health';
+      const updatedData = await HealthDataService.updatePanelData(category);
+      setSelectedPanel(updatedData);
+    } catch (error) {
+      console.error('Erro ao carregar dados do painel:', error);
+      setSelectedPanel(panel); // Fallback para dados originais
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (selectedPanel) {
     return (
@@ -48,7 +74,6 @@ export const DashboardSelector = () => {
             <Card 
               key={index} 
               className="p-6 shadow-card border-0 cursor-pointer hover:shadow-elevated transition-shadow"
-              onClick={() => setSelectedPanel(panel)}
             >
               <div className="mb-4">
                 <h3 className="text-lg font-semibold text-foreground mb-2">
@@ -61,15 +86,20 @@ export const DashboardSelector = () => {
               
               <div className="space-y-2 mb-4">
                 <Badge variant="outline" className="text-xs">
-                  {panel.kpis.length} Indicadores
+                  {panel.kpis?.length || 0} Indicadores
                 </Badge>
                 <Badge variant="outline" className="text-xs ml-2">
-                  {panel.charts.length} Gráficos
+                  {panel.charts?.length || 0} Gráficos
                 </Badge>
               </div>
 
-              <Button variant="secondary" className="w-full">
-                Ver Painel
+              <Button 
+                variant="secondary" 
+                className="w-full"
+                onClick={() => handlePanelSelect(panel)}
+                disabled={isLoading}
+              >
+                {isLoading ? "Carregando..." : "Ver Painel"}
               </Button>
             </Card>
           ))}

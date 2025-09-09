@@ -4,6 +4,7 @@ import { DashboardCategories } from "@/components/DashboardCategories";
 import { DashboardSelector } from "@/components/DashboardSelector";
 import { AISearch } from "@/components/AISearch";
 import { Reports } from "@/components/Reports";
+import { DataCollector } from "@/components/DataCollector";
 
 const Index = () => {
   return (
@@ -12,6 +13,9 @@ const Index = () => {
       <Hero />
       <DashboardCategories />
       <DashboardSelector />
+      <div className="container mx-auto px-4 py-8">
+        <DataCollector />
+      </div>
       <AISearch />
       <Reports />
     </div>

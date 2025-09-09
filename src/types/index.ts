@@ -21,8 +21,10 @@ export interface Chart {
 }
 
 export interface PanelData {
+  id?: string;
   title: string;
   description: string;
+  category?: string;
   kpis: KPI[];
   charts: Chart[];
 }
