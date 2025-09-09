@@ -2,11 +2,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Search, Sparkles, TrendingUp, Calendar } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, Sparkles, TrendingUp, Calendar, MapPin, Building2, CalendarDays } from "lucide-react";
 
 export const AISearch = () => {
   const [query, setQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedMunicipality, setSelectedMunicipality] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
 
   const handleSearch = async () => {
     setIsSearching(true);
@@ -15,6 +19,34 @@ export const AISearch = () => {
       setIsSearching(false);
     }, 2000);
   };
+
+  const states = [
+    { value: "SP", label: "São Paulo" },
+    { value: "RJ", label: "Rio de Janeiro" },
+    { value: "MG", label: "Minas Gerais" },
+    { value: "RS", label: "Rio Grande do Sul" },
+    { value: "PR", label: "Paraná" },
+    { value: "SC", label: "Santa Catarina" },
+    { value: "BA", label: "Bahia" },
+    { value: "GO", label: "Goiás" },
+    { value: "PE", label: "Pernambuco" },
+    { value: "CE", label: "Ceará" }
+  ];
+
+  const municipalities = [
+    { value: "sao-paulo", label: "São Paulo" },
+    { value: "rio-de-janeiro", label: "Rio de Janeiro" },
+    { value: "salvador", label: "Salvador" },
+    { value: "brasilia", label: "Brasília" },
+    { value: "fortaleza", label: "Fortaleza" },
+    { value: "belo-horizonte", label: "Belo Horizonte" },
+    { value: "curitiba", label: "Curitiba" },
+    { value: "recife", label: "Recife" },
+    { value: "porto-alegre", label: "Porto Alegre" },
+    { value: "goiania", label: "Goiânia" }
+  ];
+
+  const years = Array.from({ length: 7 }, (_, i) => 2024 - i);
 
   const sampleQueries = [
     "Crie um gráfico de série temporal mostrando mortalidade infantil e materna entre 2018 e 2024",
@@ -42,6 +74,69 @@ export const AISearch = () => {
         <div className="max-w-4xl mx-auto">
           <Card className="p-8 shadow-elevated border-0">
             <div className="space-y-6">
+              {/* Filtros de Estado, Município e Ano */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    Estado
+                  </label>
+                  <Select value={selectedState} onValueChange={setSelectedState}>
+                    <SelectTrigger className="h-12">
+                      <SelectValue placeholder="Selecione o estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Todos os Estados</SelectItem>
+                      {states.map((state) => (
+                        <SelectItem key={state.value} value={state.value}>
+                          {state.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                    <Building2 className="h-4 w-4" />
+                    Município
+                  </label>
+                  <Select value={selectedMunicipality} onValueChange={setSelectedMunicipality}>
+                    <SelectTrigger className="h-12">
+                      <SelectValue placeholder="Selecione o município" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Todos os Municípios</SelectItem>
+                      {municipalities.map((municipality) => (
+                        <SelectItem key={municipality.value} value={municipality.value}>
+                          {municipality.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                    <CalendarDays className="h-4 w-4" />
+                    Ano
+                  </label>
+                  <Select value={selectedYear} onValueChange={setSelectedYear}>
+                    <SelectTrigger className="h-12">
+                      <SelectValue placeholder="Selecione o ano" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Todos os Anos</SelectItem>
+                      {years.map((year) => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               <div className="flex gap-4">
                 <div className="flex-1 relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -54,7 +149,7 @@ export const AISearch = () => {
                 </div>
                 <Button 
                   size="lg"
-                  variant="professional"
+                  variant="default"
                   onClick={handleSearch}
                   disabled={isSearching}
                 >
@@ -65,7 +160,7 @@ export const AISearch = () => {
                     </>
                   ) : (
                     <>
-                      <Sparkles className="h-4 w-4" />
+                      <Sparkles className="h-4 w-4 mr-2" />
                       Buscar
                     </>
                   )}
