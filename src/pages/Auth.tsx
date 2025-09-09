@@ -31,13 +31,13 @@ const Auth = () => {
     });
   }, [user, authLoading]);
 
-  // Redirect if already authenticated (but only after loading is complete)
-  useEffect(() => {
-    if (!authLoading && user) {
-      console.log('Redirecting authenticated user to home');
-      navigate('/');
-    }
-  }, [user, authLoading, navigate]);
+  // Temporarily disable redirect for debugging
+  // useEffect(() => {
+  //   if (!authLoading && user) {
+  //     console.log('Redirecting authenticated user to home');
+  //     navigate('/');
+  //   }
+  // }, [user, authLoading, navigate]);
 
   // Temporary logout handler for debugging
   const handleLogout = async () => {
