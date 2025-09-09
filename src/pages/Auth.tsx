@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -152,11 +153,27 @@ const Auth = () => {
               <Separator className="my-4" />
               <Button
                 variant="outline"
-                className="w-full"
+                className="w-full mb-2"
                 onClick={handleGoogleAuth}
                 disabled={loading}
               >
                 Continuar com Google
+              </Button>
+              
+              <Button
+                variant="ghost"
+                className="w-full text-xs"
+                onClick={async () => {
+                  console.log('Verificando sessão...');
+                  const { data } = await supabase.auth.getSession();
+                  console.log('Sessão atual:', data);
+                  if (data.session) {
+                    console.log('Sessão encontrada, forçando redirect...');
+                    window.location.href = '/';
+                  }
+                }}
+              >
+                🔄 Verificar se há sessão ativa
               </Button>
             </div>
 
