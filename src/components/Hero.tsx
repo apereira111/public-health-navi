@@ -12,9 +12,9 @@ export const Hero = () => {
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
-                <span className="block">Transforme Dados de</span>
+                <span className="block">Transforme</span>
                 <span className="block text-accent bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent">
-                  Saúde Pública
+                  Dados de Saúde Pública
                 </span>
                 <span className="block">em Ação</span>
               </h1>
