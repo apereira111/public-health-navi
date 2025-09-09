@@ -25,7 +25,7 @@ export const Navigation = () => {
             <div className="flex-shrink-0 flex items-center">
               <BarChart3 className="h-8 w-8 text-primary" />
               <span className="ml-2 text-xl font-bold text-foreground">
-                HealthDash
+                Gestão +
               </span>
             </div>
             <div className="hidden md:block ml-10">
@@ -68,7 +68,7 @@ export const Navigation = () => {
                       : 'text-muted-foreground hover:text-primary'
                   }`}
                 >
-                  Analytics
+                  Pesquisa Avançada
                 </Link>
               </div>
             </div>
