@@ -12,6 +12,9 @@ const Index = () => {
       <Navigation />
       <Hero />
       <DashboardCategories />
+      <div id="demonstracao">
+        <DashboardSelector />
+      </div>
     </div>
   );
 };

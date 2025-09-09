@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BarChart3, TrendingUp, Users } from "lucide-react";
+import { ArrowRight, BarChart3, TrendingUp, Users, Play } from "lucide-react";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-dashboard.jpg";
 
 export const Hero = () => {
@@ -11,21 +12,35 @@ export const Hero = () => {
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
-                Transforme Dados de
-                <span className="block text-accent">Saúde Pública em Ação</span>
+                <span className="block">Transforme Dados de</span>
+                <span className="block text-accent bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent">
+                  Saúde Pública
+                </span>
+                <span className="block">em Ação</span>
               </h1>
-              <p className="text-xl text-primary-glow leading-relaxed">
+              <p className="text-xl text-primary-glow leading-relaxed max-w-lg">
                 Capacite gestores de saúde com painéis inteligentes, análises com IA 
                 e relatórios automatizados para melhores resultados em saúde.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="hero" size="lg" className="group">
-                Criar Painéis
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button variant="outline" size="lg" className="border-primary-glow text-primary-glow hover:bg-primary-glow hover:text-primary">
+              <Link to="/dashboards">
+                <Button variant="hero" size="lg" className="group w-full sm:w-auto">
+                  Explorar Painéis
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="border-primary-glow text-primary-glow hover:bg-primary-glow hover:text-primary group"
+                onClick={() => {
+                  // Scroll para a seção de categorias que serve como demonstração
+                  document.getElementById('demonstracao')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                <Play className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                 Ver Demonstração
               </Button>
             </div>
