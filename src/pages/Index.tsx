@@ -1,7 +1,7 @@
 import { Navigation } from "@/components/Navigation";
 import { Hero } from "@/components/Hero";
 import { DashboardCategories } from "@/components/DashboardCategories";
-import { SampleDashboard } from "@/components/SampleDashboard";
+import { DashboardSelector } from "@/components/DashboardSelector";
 import { AISearch } from "@/components/AISearch";
 import { Reports } from "@/components/Reports";
 
@@ -11,7 +11,7 @@ const Index = () => {
       <Navigation />
       <Hero />
       <DashboardCategories />
-      <SampleDashboard />
+      <DashboardSelector />
       <AISearch />
       <Reports />
     </div>
