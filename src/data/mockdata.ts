@@ -2,6 +2,7 @@ import type { PanelData, IndicatorOption } from '../types';
 
 // Painéis (exemplos — ajuste os conteúdos conforme seu projeto)
 export const primaryCareData: PanelData = {
+  id: "primary-care",
   title: "Indicadores Gerais de Saúde",
   description: "Dados gerais de saúde.",
   kpis: [
@@ -29,6 +30,7 @@ export const primaryCareData: PanelData = {
 };
 
 export const financingData: PanelData = {
+  id: "financing",
   title: "Financiamento da APS",
   description: "Indicadores financeiros da APS no Brasil.",
   kpis: [
@@ -50,6 +52,7 @@ export const financingData: PanelData = {
 };
 
 export const childHealthData: PanelData = {
+  id: "child-health",
   title: "Saúde da Criança",
   description: "Indicadores de saúde infantil no Brasil.",
   kpis: [
@@ -73,6 +76,7 @@ export const childHealthData: PanelData = {
 };
 
 export const womenHealthData: PanelData = {
+  id: "womens-health",
   title: "Saúde da Mulher",
   description: "Indicadores de saúde feminina.",
   kpis: [
@@ -98,6 +102,7 @@ export const womenHealthData: PanelData = {
 };
 
 export const dengueData: PanelData = {
+  id: "epidemiology",
   title: "Dengue",
   description: "Indicadores de dengue.",
   kpis: [
@@ -113,6 +118,7 @@ export const dengueData: PanelData = {
 };
 
 export const chronicDiseasesData: PanelData = {
+  id: "chronic-diseases",
   title: "Doenças Crônicas",
   description: "Distribuição de doenças crônicas.",
   kpis: [
@@ -128,6 +134,7 @@ export const chronicDiseasesData: PanelData = {
 };
 
 export const oralHealthData: PanelData = {
+  id: "oral-health",
   title: "Saúde Bucal",
   description: "Indicadores de saúde bucal.",
   kpis: [
@@ -144,6 +151,7 @@ export const oralHealthData: PanelData = {
 
 // Novo: Saúde do Idoso
 export const elderlyHealthData: PanelData = {
+  id: "elderly-health",
   title: "Saúde do Idoso",
   description: "Indicadores da população idosa.",
   kpis: [
@@ -160,6 +168,7 @@ export const elderlyHealthData: PanelData = {
 
 // Novo: Saúde Mental (corrigido conforme anterior)
 export const mentalHealthData: PanelData = {
+  id: "mental-health",
   title: "Saúde Mental",
   description: "Indicadores de saúde mental no Brasil.",
   kpis: [

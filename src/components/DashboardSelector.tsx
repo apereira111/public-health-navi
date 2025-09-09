@@ -21,10 +21,14 @@ export const DashboardSelector = () => {
         'womens-health': 'womens_health', 
         'mental-health': 'mental_health',
         'chronic-diseases': 'chronic_diseases',
-        'epidemiology': 'epidemiology'
+        'epidemiology': 'epidemiology',
+        'primary-care': 'oral_health', // fallback
+        'financing': 'oral_health', // fallback
+        'child-health': 'womens_health', // relacionado
+        'elderly-health': 'chronic_diseases' // relacionado
       };
       
-      const category = categoryMap[panel.id] || 'oral_health';
+      const category = categoryMap[panel.id || ''] || 'oral_health';
       const updatedData = await HealthDataService.updatePanelData(category);
       setSelectedPanel(updatedData);
     } catch (error) {

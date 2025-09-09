@@ -13,7 +13,6 @@ const Dashboards = () => {
             Explore nossos painéis interativos com dados de saúde em tempo real
           </p>
         </div>
-        <DashboardCategories />
         <DashboardSelector />
       </div>
     </div>
