@@ -4,39 +4,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DashboardPanel } from "./DashboardPanel";
 import { allPanels } from "@/data/mockdata";
-import { HealthDataService } from "@/services/HealthDataService";
 import type { PanelData } from "@/types";
 
 export const DashboardSelector = () => {
   const [selectedPanel, setSelectedPanel] = useState<PanelData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
-  // Função para carregar dados dinâmicos do painel
-  const handlePanelSelect = async (panel: PanelData) => {
-    setIsLoading(true);
-    try {
-      // Mapeia ID do painel para categoria do serviço
-      const categoryMap: Record<string, string> = {
-        'oral-health': 'oral_health',
-        'womens-health': 'womens_health', 
-        'mental-health': 'mental_health',
-        'chronic-diseases': 'chronic_diseases',
-        'epidemiology': 'epidemiology',
-        'primary-care': 'oral_health', // fallback
-        'financing': 'oral_health', // fallback
-        'child-health': 'womens_health', // relacionado
-        'elderly-health': 'chronic_diseases' // relacionado
-      };
-      
-      const category = categoryMap[panel.id || ''] || 'oral_health';
-      const updatedData = await HealthDataService.updatePanelData(category);
-      setSelectedPanel(updatedData);
-    } catch (error) {
-      console.error('Erro ao carregar dados do painel:', error);
-      setSelectedPanel(panel); // Fallback para dados originais
-    } finally {
-      setIsLoading(false);
-    }
+  // Função para selecionar painel diretamente
+  const handlePanelSelect = (panel: PanelData) => {
+    setSelectedPanel(panel);
   };
 
   if (selectedPanel) {
@@ -101,9 +76,8 @@ export const DashboardSelector = () => {
                 variant="secondary" 
                 className="w-full"
                 onClick={() => handlePanelSelect(panel)}
-                disabled={isLoading}
               >
-                {isLoading ? "Carregando..." : "Ver Painel"}
+                Ver Painel
               </Button>
             </Card>
           ))}
