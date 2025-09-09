@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EvilBarChart, EvilLineChart, EvilPieChart } from "@/components/ui/evil-charts";
 import { TrendingUp, TrendingDown, Activity, BarChart3, LineChart, PieChart } from "lucide-react";
+import { ReportGenerator } from "@/components/ReportGenerator";
 import type { PanelData } from "@/types";
 
 interface DashboardPanelProps {
@@ -70,9 +71,12 @@ export const DashboardPanel = ({ data }: DashboardPanelProps) => {
         <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-4 animate-fade-in">
           {data.title}
         </h1>
-        <p className="text-xl text-muted-foreground animate-fade-in">
+        <p className="text-xl text-muted-foreground mb-6 animate-fade-in">
           {data.description}
         </p>
+        <div className="flex justify-center animate-fade-in">
+          <ReportGenerator panelData={data} />
+        </div>
       </div>
 
       {/* KPIs Grid */}
