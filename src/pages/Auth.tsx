@@ -18,16 +18,36 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
-  const { signIn, signUp, signInWithGoogle, user } = useAuth();
+  const { signIn, signUp, signInWithGoogle, user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Redirect if already authenticated
+  // Debug logs to understand current state
   useEffect(() => {
-    if (user) {
+    console.log('Auth page state:', { 
+      user: user ? 'logged in' : 'not logged in', 
+      authLoading,
+      userId: user?.id 
+    });
+  }, [user, authLoading]);
+
+  // Redirect if already authenticated (but only after loading is complete)
+  useEffect(() => {
+    if (!authLoading && user) {
+      console.log('Redirecting authenticated user to home');
       navigate('/');
     }
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
+
+  // Temporary logout handler for debugging
+  const handleLogout = async () => {
+    console.log('Logging out...');
+    await signOut();
+    toast({
+      title: "Logout realizado",
+      description: "Você foi deslogado com sucesso",
+    });
+  };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,6 +141,15 @@ const Auth = () => {
             <CardDescription>
               Faça login ou crie sua conta para continuar
             </CardDescription>
+            {/* Temporary debug info and logout button */}
+            {user && (
+              <div className="mt-2 p-2 bg-muted rounded text-sm">
+                <p>Usuário logado: {user.email}</p>
+                <Button variant="outline" size="sm" onClick={handleLogout} className="mt-1">
+                  Logout (Debug)
+                </Button>
+              </div>
+            )}
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login" className="w-full">
