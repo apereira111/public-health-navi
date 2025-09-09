@@ -35,10 +35,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       (event, session) => {
         if (mounted) {
           console.log('Auth state change:', event, session?.user?.email || 'no user');
-          if (event === 'SIGNED_IN' && session) {
-            console.log('Usuário logado com sucesso, redirecionando...');
-            window.location.href = '/';
-          }
           setSession(session);
           setUser(session?.user ?? null);
           setLoading(false);
