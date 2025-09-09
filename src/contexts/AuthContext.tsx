@@ -90,10 +90,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signInWithGoogle = async () => {
     console.log('Iniciando login com Google...');
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google'
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+          skipBrowserRedirect: false
+        }
       });
-      console.log('Resposta do Supabase:', { error });
+      console.log('Resposta do Supabase:', { data, error });
+      
+      if (error) {
+        console.error('Erro específico:', error);
+      }
+      
       return { error };
     } catch (err) {
       console.error('Erro no login Google:', err);
