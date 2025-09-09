@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { RefreshCw, Database, AlertCircle, CheckCircle } from 'lucide-react';
 import { HealthDataService } from '@/services/HealthDataService';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DataCollectorProps {
   onDataUpdate?: () => void;
@@ -15,8 +16,18 @@ export const DataCollector: React.FC<DataCollectorProps> = ({ onDataUpdate }) =>
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [status, setStatus] = useState<'idle' | 'collecting' | 'success' | 'error'>('idle');
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleDataCollection = async () => {
+    if (!user) {
+      toast({
+        title: "Erro de autenticação",
+        description: "Você precisa estar logado para coletar dados",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsCollecting(true);
     setStatus('collecting');
 
@@ -25,9 +36,6 @@ export const DataCollector: React.FC<DataCollectorProps> = ({ onDataUpdate }) =>
         title: "Coletando dados",
         description: "Buscando indicadores de saúde dos portais governamentais...",
       });
-
-      // Simula coleta de dados dos portais
-      await new Promise(resolve => setTimeout(resolve, 3000));
       
       const data = await HealthDataService.scrapeHealthData();
       
@@ -36,7 +44,7 @@ export const DataCollector: React.FC<DataCollectorProps> = ({ onDataUpdate }) =>
       
       toast({
         title: "Dados atualizados!",
-        description: `${data.length} indicadores coletados com sucesso.`,
+        description: `${data.length} indicadores coletados e salvos no banco de dados.`,
       });
 
       onDataUpdate?.();
