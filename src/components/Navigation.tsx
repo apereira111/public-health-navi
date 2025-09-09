@@ -25,11 +25,21 @@ export const Navigation = () => {
             <div className="flex-shrink-0 flex items-center">
               <BarChart3 className="h-8 w-8 text-primary" />
               <span className="ml-2 text-xl font-bold text-foreground">
-                Gestor +
+                HealthDash
               </span>
             </div>
             <div className="hidden md:block ml-10">
               <div className="flex space-x-8">
+                <Link 
+                  to="/" 
+                  className={`transition-colors duration-200 ${
+                    location.pathname === '/' 
+                      ? 'text-primary font-medium' 
+                      : 'text-muted-foreground hover:text-primary'
+                  }`}
+                >
+                  Início
+                </Link>
                 <Link 
                   to="/dashboards" 
                   className={`transition-colors duration-200 ${
@@ -58,7 +68,7 @@ export const Navigation = () => {
                       : 'text-muted-foreground hover:text-primary'
                   }`}
                 >
-                  Análises
+                  Analytics
                 </Link>
               </div>
             </div>

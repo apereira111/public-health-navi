@@ -3,7 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Download, TrendingUp, TrendingDown, Calendar, BarChart3 } from "lucide-react";
+import { FileText, Download, TrendingUp, TrendingDown, Calendar, BarChart3, Save } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import type { PanelData } from "@/types";
 
 interface ReportGeneratorProps {
@@ -12,6 +15,9 @@ interface ReportGeneratorProps {
 
 export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const { toast } = useToast();
+  const { user } = useAuth();
 
   const generateExecutiveSummary = () => {
     const positiveKpis = panelData.kpis.filter(kpi => kpi.changeType === 'increase').length;
@@ -83,6 +89,60 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
     month: 'long',
     day: 'numeric'
   });
+
+  const saveReport = async () => {
+    if (!user) {
+      toast({
+        title: "Erro",
+        description: "Você precisa estar logado para salvar relatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    
+    try {
+      const reportContent = {
+        title: panelData.title,
+        description: panelData.description,
+        date: currentDate,
+        executiveSummary: generateExecutiveSummary(),
+        insights: generateInsights(),
+        recommendations: generateRecommendations(),
+        kpis: panelData.kpis
+      };
+
+      const { error } = await supabase
+        .from('saved_reports')
+        .insert({
+          user_id: user.id,
+          title: `Relatório: ${panelData.title} - ${currentDate}`,
+          content: reportContent as any,
+          panel_data: panelData as any
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Relatório Salvo!",
+        description: "Seu relatório foi salvo com sucesso e está disponível na página de Relatórios.",
+      });
+
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Erro ao salvar relatório:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível salvar o relatório. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -185,6 +245,14 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
 
           {/* Ações */}
           <div className="flex gap-3 pt-4 border-t">
+            <Button 
+              onClick={saveReport}
+              disabled={isSaving || !user}
+              className="gap-2"
+            >
+              <Save className="h-4 w-4" />
+              {isSaving ? "Salvando..." : "Salvar Relatório"}
+            </Button>
             <Button variant="professional" className="gap-2">
               <Download className="h-4 w-4" />
               Baixar Relatório

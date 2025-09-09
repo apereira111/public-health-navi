@@ -180,6 +180,36 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_reports: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          panel_data: Json
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          id?: string
+          panel_data: Json
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          panel_data?: Json
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
