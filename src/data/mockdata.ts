@@ -3,8 +3,8 @@ import type { PanelData, IndicatorOption } from '../types';
 // Painéis (exemplos — ajuste os conteúdos conforme seu projeto)
 export const primaryCareData: PanelData = {
   id: "primary-care",
-  title: "Indicadores Gerais de Saúde",
-  description: "Dados gerais de saúde.",
+  title: "Atenção Primária",
+  description: "Indicadores da Atenção Primária à Saúde no Brasil.",
   kpis: [
     { id: 'pc-1', title: 'Atendimentos NASF', value: '4.123.456', change: '+5.2%', changeType: 'increase', description: 'Total de atendimentos NASF no ano.' },
     { id: 'pc-2', title: 'Cobertura ESF', value: '82.1%', change: '+1.5%', changeType: 'increase', description: 'Cobertura da Estratégia Saúde da Família.' },
