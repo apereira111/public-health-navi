@@ -12,46 +12,46 @@ import {
 
 const categories = [
   {
-    title: "Women's Health",
-    description: "Maternal mortality, reproductive health, prenatal care indicators",
+    title: "Saúde da Mulher",
+    description: "Mortalidade materna, saúde reprodutiva, indicadores de pré-natal",
     icon: Heart,
     color: "text-chart-1",
-    stats: "45 indicators",
+    stats: "45 indicadores",
   },
   {
-    title: "Children's Health", 
-    description: "Infant mortality, vaccination rates, child development metrics",
+    title: "Saúde da Criança", 
+    description: "Mortalidade infantil, taxas de vacinação, métricas de desenvolvimento infantil",
     icon: Baby,
     color: "text-chart-2",
-    stats: "38 indicators",
+    stats: "38 indicadores",
   },
   {
-    title: "Senior Health",
-    description: "Chronic disease management, elderly care, quality of life metrics",
+    title: "Saúde do Idoso",
+    description: "Gestão de doenças crônicas, cuidados com idosos, métricas de qualidade de vida",
     icon: Users,
     color: "text-chart-3",
-    stats: "52 indicators",
+    stats: "52 indicadores",
   },
   {
-    title: "Financing",
-    description: "Healthcare costs, budget allocation, cost-effectiveness analysis",
+    title: "Financiamento",
+    description: "Custos de saúde, alocação orçamentária, análise de custo-efetividade",
     icon: DollarSign,
     color: "text-chart-4",
-    stats: "29 indicators",
+    stats: "29 indicadores",
   },
   {
-    title: "Primary Care",
-    description: "Access to care, preventive services, primary care utilization",
+    title: "Atenção Primária",
+    description: "Acesso ao cuidado, serviços preventivos, utilização da atenção primária",
     icon: Stethoscope,
     color: "text-chart-5",
-    stats: "41 indicators",
+    stats: "41 indicadores",
   },
   {
-    title: "Mental Health",
-    description: "Mental health services, suicide rates, psychological wellbeing",
+    title: "Saúde Mental",
+    description: "Serviços de saúde mental, taxas de suicídio, bem-estar psicológico",
     icon: Brain,
     color: "text-chart-1",
-    stats: "33 indicators",
+    stats: "33 indicadores",
   },
 ];
 
@@ -61,10 +61,10 @@ export const DashboardCategories = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            Health Dashboard Categories
+            Categorias de Painéis de Saúde
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Organize and analyze health data across key areas of public health management
+            Organize e analise dados de saúde nas principais áreas da gestão de saúde pública
           </p>
         </div>
 
@@ -99,7 +99,7 @@ export const DashboardCategories = () => {
                     variant="ghost" 
                     className="w-full justify-between group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                   >
-                    View Dashboard
+                    Ver Painel
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </div>

@@ -5,24 +5,24 @@ import { FileText, Download, Sparkles, Calendar, TrendingUp } from "lucide-react
 
 const reportTemplates = [
   {
-    title: "Monthly Health Summary",
-    description: "Comprehensive overview of key health indicators with trend analysis",
-    type: "Executive Summary",
-    frequency: "Monthly",
+    title: "Resumo Mensal de Saúde",
+    description: "Visão abrangente dos principais indicadores de saúde com análise de tendências",
+    type: "Resumo Executivo",
+    frequency: "Mensal",
     icon: Calendar,
   },
   {
-    title: "Maternal Health Report",
-    description: "Detailed analysis of maternal mortality, prenatal care, and birth outcomes",
-    type: "Specialized Report",
-    frequency: "Quarterly",
+    title: "Relatório de Saúde Materna",
+    description: "Análise detalhada da mortalidade materna, cuidados pré-natais e resultados de nascimento",
+    type: "Relatório Especializado",
+    frequency: "Trimestral",
     icon: FileText,
   },
   {
-    title: "Disease Surveillance Report",
-    description: "Real-time tracking of infectious diseases and outbreak patterns",
-    type: "Surveillance",
-    frequency: "Weekly",
+    title: "Relatório de Vigilância de Doenças",
+    description: "Rastreamento em tempo real de doenças infecciosas e padrões de surtos",
+    type: "Vigilância",
+    frequency: "Semanal",
     icon: TrendingUp,
   },
 ];
@@ -34,13 +34,13 @@ export const Reports = () => {
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 bg-accent-light text-accent font-medium px-4 py-2 rounded-full mb-6">
             <Sparkles className="h-4 w-4" />
-            AI-Generated Reports
+            Relatórios Gerados por IA
           </div>
           <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            Automated Report Generation
+            Geração Automatizada de Relatórios
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Generate professional health reports with AI analysis, insights, and recommendations
+            Gere relatórios profissionais de saúde com análises, insights e recomendações da IA
           </p>
         </div>
 
@@ -79,7 +79,7 @@ export const Reports = () => {
                     className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors"
                   >
                     <Download className="h-4 w-4 mr-2" />
-                    Generate Report
+                    Gerar Relatório
                   </Button>
                 </div>
               </Card>
@@ -91,59 +91,59 @@ export const Reports = () => {
         <Card className="p-8 shadow-elevated border-0 bg-gradient-subtle">
           <div className="text-center mb-8">
             <h3 className="text-2xl font-bold text-foreground mb-2">
-              Sample AI-Generated Report
+              Exemplo de Relatório Gerado por IA
             </h3>
             <p className="text-muted-foreground">
-              Preview of an automated monthly health summary
+              Prévia de um resumo mensal automatizado de saúde
             </p>
           </div>
 
           <div className="bg-card rounded-lg p-8 shadow-card">
             <div className="border-l-4 border-primary pl-6 mb-6">
               <h4 className="text-lg font-semibold text-foreground mb-2">
-                Executive Summary - October 2024
+                Resumo Executivo - Outubro 2024
               </h4>
               <p className="text-muted-foreground leading-relaxed">
-                This month's health data shows significant improvements in maternal health outcomes, 
-                with a 12.5% reduction in maternal mortality rates compared to the same period last year. 
-                Key factors contributing to this improvement include increased prenatal care coverage 
-                and enhanced emergency obstetric services.
+                Os dados de saúde deste mês mostram melhorias significativas nos resultados de saúde materna, 
+                com uma redução de 12,5% nas taxas de mortalidade materna em comparação ao mesmo período do ano passado. 
+                Os principais fatores que contribuíram para essa melhoria incluem aumento da cobertura de cuidados pré-natais 
+                e melhoria dos serviços de obstetrícia de emergência.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <h5 className="font-semibold text-foreground mb-3">Key Achievements</h5>
+                <h5 className="font-semibold text-foreground mb-3">Principais Conquistas</h5>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-secondary rounded-full"></div>
-                    Maternal mortality reduced by 12.5%
+                    Mortalidade materna reduzida em 12,5%
                   </li>
                   <li className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-secondary rounded-full"></div>
-                    Prenatal care coverage increased to 89.2%
+                    Cobertura de cuidados pré-natais aumentou para 89,2%
                   </li>
                   <li className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-secondary rounded-full"></div>
-                    Vaccination rates improved by 2.3%
+                    Taxas de vacinação melhoraram em 2,3%
                   </li>
                 </ul>
               </div>
               
               <div>
-                <h5 className="font-semibold text-foreground mb-3">Recommendations</h5>
+                <h5 className="font-semibold text-foreground mb-3">Recomendações</h5>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-accent rounded-full"></div>
-                    Expand rural prenatal care programs
+                    Expandir programas de cuidados pré-natais rurais
                   </li>
                   <li className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-accent rounded-full"></div>
-                    Increase emergency transport funding
+                    Aumentar financiamento de transporte de emergência
                   </li>
                   <li className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-accent rounded-full"></div>
-                    Enhance community health worker training
+                    Melhorar treinamento de agentes comunitários de saúde
                   </li>
                 </ul>
               </div>

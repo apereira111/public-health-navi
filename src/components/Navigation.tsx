@@ -16,13 +16,13 @@ export const Navigation = () => {
             <div className="hidden md:block ml-10">
               <div className="flex space-x-8">
                 <a href="#" className="text-foreground hover:text-primary transition-colors duration-200">
-                  Dashboards
+                  Painéis
                 </a>
                 <a href="#" className="text-muted-foreground hover:text-primary transition-colors duration-200">
-                  Reports
+                  Relatórios
                 </a>
                 <a href="#" className="text-muted-foreground hover:text-primary transition-colors duration-200">
-                  Analytics
+                  Análises
                 </a>
               </div>
             </div>
@@ -38,7 +38,7 @@ export const Navigation = () => {
               <Settings className="h-4 w-4" />
             </Button>
             <Button variant="professional">
-              Get Started
+              Começar
             </Button>
           </div>
         </div>

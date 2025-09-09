@@ -17,10 +17,10 @@ export const AISearch = () => {
   };
 
   const sampleQueries = [
-    "Create a time series graph showing infant mortality and maternal mortality between 2018 and 2024",
-    "Compare vaccination rates across different age groups",
-    "Show correlation between healthcare financing and patient outcomes",
-    "Generate senior health dashboard for last 5 years"
+    "Crie um gráfico de série temporal mostrando mortalidade infantil e materna entre 2018 e 2024",
+    "Compare taxas de vacinação entre diferentes faixas etárias",
+    "Mostre correlação entre financiamento da saúde e resultados dos pacientes",
+    "Gere painel de saúde do idoso dos últimos 5 anos"
   ];
 
   return (
@@ -29,13 +29,13 @@ export const AISearch = () => {
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 bg-accent-light text-accent font-medium px-4 py-2 rounded-full mb-6">
             <Sparkles className="h-4 w-4" />
-            AI-Powered Analytics
+            Análises com IA
           </div>
           <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            Ask AI to Build Your Dashboard
+            Peça para a IA Criar Seu Painel
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Use natural language to search across health indicators and create custom visualizations
+            Use linguagem natural para buscar indicadores de saúde e criar visualizações personalizadas
           </p>
         </div>
 
@@ -46,7 +46,7 @@ export const AISearch = () => {
                 <div className="flex-1 relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input 
-                    placeholder="Ask AI to create dashboards, charts, or analyze health data..."
+                    placeholder="Peça para a IA criar painéis, gráficos ou analisar dados de saúde..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     className="pl-12 h-14 text-lg"
@@ -61,19 +61,19 @@ export const AISearch = () => {
                   {isSearching ? (
                     <>
                       <div className="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full mr-2" />
-                      Searching...
+                      Buscando...
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-4 w-4" />
-                      Search
+                      Buscar
                     </>
                   )}
                 </Button>
               </div>
 
               <div className="space-y-3">
-                <p className="text-sm font-medium text-muted-foreground">Sample queries:</p>
+                <p className="text-sm font-medium text-muted-foreground">Exemplos de consultas:</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {sampleQueries.map((sample, index) => (
                     <button
@@ -92,33 +92,33 @@ export const AISearch = () => {
           {/* Mock Results */}
           {isSearching && (
             <Card className="mt-6 p-6 shadow-card">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-primary">
-                  <Sparkles className="h-5 w-5 animate-pulse" />
-                  <span className="font-medium">AI is analyzing health data...</span>
-                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-primary">
+                    <Sparkles className="h-5 w-5 animate-pulse" />
+                    <span className="font-medium">IA está analisando dados de saúde...</span>
+                  </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                    <TrendingUp className="h-5 w-5 text-chart-1" />
-                    <div>
-                      <div className="text-sm font-medium">Found 15 indicators</div>
-                      <div className="text-xs text-muted-foreground">Across 3 categories</div>
+                    <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                      <TrendingUp className="h-5 w-5 text-chart-1" />
+                      <div>
+                        <div className="text-sm font-medium">15 indicadores encontrados</div>
+                        <div className="text-xs text-muted-foreground">Em 3 categorias</div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                    <Calendar className="h-5 w-5 text-chart-2" />
-                    <div>
-                      <div className="text-sm font-medium">2018-2024 data</div>
-                      <div className="text-xs text-muted-foreground">7 years coverage</div>
+                    <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                      <Calendar className="h-5 w-5 text-chart-2" />
+                      <div>
+                        <div className="text-sm font-medium">Dados 2018-2024</div>
+                        <div className="text-xs text-muted-foreground">7 anos de cobertura</div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                    <Search className="h-5 w-5 text-chart-3" />
-                    <div>
-                      <div className="text-sm font-medium">Creating charts</div>
-                      <div className="text-xs text-muted-foreground">Time series & trends</div>
+                    <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                      <Search className="h-5 w-5 text-chart-3" />
+                      <div>
+                        <div className="text-sm font-medium">Criando gráficos</div>
+                        <div className="text-xs text-muted-foreground">Séries temporais e tendências</div>
+                      </div>
                     </div>
-                  </div>
                 </div>
               </div>
             </Card>

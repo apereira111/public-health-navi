@@ -11,22 +11,22 @@ export const Hero = () => {
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
-                Transform Public Health
-                <span className="block text-accent">Data Into Action</span>
+                Transforme Dados de
+                <span className="block text-accent">Saúde Pública em Ação</span>
               </h1>
               <p className="text-xl text-primary-glow leading-relaxed">
-                Empower health managers with intelligent dashboards, AI-powered analytics, 
-                and automated reporting for better health outcomes.
+                Capacite gestores de saúde com painéis inteligentes, análises com IA 
+                e relatórios automatizados para melhores resultados em saúde.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Button variant="hero" size="lg" className="group">
-                Start Building Dashboards
+                Criar Painéis
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button variant="outline" size="lg" className="border-primary-glow text-primary-glow hover:bg-primary-glow hover:text-primary">
-                Watch Demo
+                Ver Demonstração
               </Button>
             </div>
 
@@ -36,21 +36,21 @@ export const Hero = () => {
                   <BarChart3 className="h-6 w-6 text-accent" />
                 </div>
                 <div className="text-2xl font-bold">15+</div>
-                <div className="text-sm text-primary-glow">Health Categories</div>
+                <div className="text-sm text-primary-glow">Categorias de Saúde</div>
               </div>
               <div className="text-center">
                 <div className="bg-primary-glow/20 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3">
                   <TrendingUp className="h-6 w-6 text-accent" />
                 </div>
                 <div className="text-2xl font-bold">200+</div>
-                <div className="text-sm text-primary-glow">Health Indicators</div>
+                <div className="text-sm text-primary-glow">Indicadores de Saúde</div>
               </div>
               <div className="text-center">
                 <div className="bg-primary-glow/20 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3">
                   <Users className="h-6 w-6 text-accent" />
                 </div>
                 <div className="text-2xl font-bold">500+</div>
-                <div className="text-sm text-primary-glow">Health Managers</div>
+                <div className="text-sm text-primary-glow">Gestores de Saúde</div>
               </div>
             </div>
           </div>
