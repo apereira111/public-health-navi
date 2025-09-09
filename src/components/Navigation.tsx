@@ -3,9 +3,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { BarChart3, Search, FileText, Settings, User, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { Link, useLocation } from "react-router-dom";
 
 export const Navigation = () => {
   const { user, signOut } = useAuth();
+  const location = useLocation();
 
   const handleSignOut = async () => {
     await signOut();
@@ -28,15 +30,36 @@ export const Navigation = () => {
             </div>
             <div className="hidden md:block ml-10">
               <div className="flex space-x-8">
-                <a href="#" className="text-foreground hover:text-primary transition-colors duration-200">
+                <Link 
+                  to="/dashboards" 
+                  className={`transition-colors duration-200 ${
+                    location.pathname === '/dashboards' 
+                      ? 'text-primary font-medium' 
+                      : 'text-muted-foreground hover:text-primary'
+                  }`}
+                >
                   Painéis
-                </a>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors duration-200">
+                </Link>
+                <Link 
+                  to="/reports" 
+                  className={`transition-colors duration-200 ${
+                    location.pathname === '/reports' 
+                      ? 'text-primary font-medium' 
+                      : 'text-muted-foreground hover:text-primary'
+                  }`}
+                >
                   Relatórios
-                </a>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors duration-200">
+                </Link>
+                <Link 
+                  to="/analytics" 
+                  className={`transition-colors duration-200 ${
+                    location.pathname === '/analytics' 
+                      ? 'text-primary font-medium' 
+                      : 'text-muted-foreground hover:text-primary'
+                  }`}
+                >
                   Análises
-                </a>
+                </Link>
               </div>
             </div>
           </div>
