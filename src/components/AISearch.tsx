@@ -15,7 +15,29 @@ export const AISearch = () => {
   const generateRelevantResults = (query: string): string[] => {
     const lowercaseQuery = query.toLowerCase();
     
-    if (lowercaseQuery.includes('morte materna') || lowercaseQuery.includes('mortalidade materna')) {
+    // Verifica se a consulta menciona ambos os indicadores
+    const hasMortalidadeMaterna = lowercaseQuery.includes('morte materna') || lowercaseQuery.includes('mortalidade materna');
+    const hasMortalidadeInfantil = lowercaseQuery.includes('mortalidade infantil') || lowercaseQuery.includes('morte infantil');
+    
+    if (hasMortalidadeMaterna && hasMortalidadeInfantil) {
+      return [
+        `Dados de mortalidade materna e infantil no Brasil em 2024:`,
+        "",
+        "📊 MORTALIDADE MATERNA:",
+        "• Taxa: 60 óbitos por 100.000 nascidos vivos",
+        "• Principais causas: hipertensão (37%), hemorragia (11%), infecção (8%)",
+        "• Redução de 12% em relação a 2023 (68 óbitos/100.000)",
+        "• Regiões críticas: Norte (89/100.000) e Nordeste (71/100.000)",
+        "",
+        "👶 MORTALIDADE INFANTIL:",
+        "• Coeficiente: 12.4 óbitos por 1.000 nascidos vivos",
+        "• Mortalidade neonatal: 8.1/1.000 (65% do total)",
+        "• Principais causas: prematuridade (35%), malformações (18%)",
+        "• Tendência: redução de 8% em relação a 2023"
+      ];
+    }
+    
+    if (hasMortalidadeMaterna) {
       return [
         `Análise sobre mortalidade materna no Brasil em 2024:`,
         "• Taxa de mortalidade materna: 60 óbitos por 100.000 nascidos vivos",
@@ -26,7 +48,7 @@ export const AISearch = () => {
       ];
     }
     
-    if (lowercaseQuery.includes('mortalidade infantil') || lowercaseQuery.includes('morte infantil')) {
+    if (hasMortalidadeInfantil) {
       return [
         `Dados de mortalidade infantil no Brasil em 2024:`,
         "• Coeficiente de mortalidade infantil: 12.4 óbitos por 1.000 nascidos vivos",
