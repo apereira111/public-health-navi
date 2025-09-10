@@ -12,6 +12,65 @@ export const AISearch = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  const generateRelevantResults = (query: string): string[] => {
+    const lowercaseQuery = query.toLowerCase();
+    
+    if (lowercaseQuery.includes('morte materna') || lowercaseQuery.includes('mortalidade materna')) {
+      return [
+        `Análise sobre mortalidade materna no Brasil em 2024:`,
+        "• Taxa de mortalidade materna: 60 óbitos por 100.000 nascidos vivos",
+        "• Principais causas: hipertensão (37%), hemorragia (11%), infecção (8%)",
+        "• Redução de 12% em relação a 2023 (68 óbitos/100.000)",
+        "• Meta ODS: reduzir para menos de 30 óbitos/100.000 até 2030",
+        "• Regiões com maior incidência: Norte (89/100.000) e Nordeste (71/100.000)"
+      ];
+    }
+    
+    if (lowercaseQuery.includes('mortalidade infantil') || lowercaseQuery.includes('morte infantil')) {
+      return [
+        `Dados de mortalidade infantil no Brasil em 2024:`,
+        "• Coeficiente de mortalidade infantil: 12.4 óbitos por 1.000 nascidos vivos",
+        "• Mortalidade neonatal: 8.1 óbitos por 1.000 nascidos vivos (65% do total)",
+        "• Mortalidade pós-neonatal: 4.3 óbitos por 1.000 nascidos vivos",
+        "• Principais causas: prematuridade (35%), malformações (18%), asfixia (12%)",
+        "• Tendência: redução de 8% em relação a 2023 (13.5/1.000)"
+      ];
+    }
+    
+    if (lowercaseQuery.includes('dengue')) {
+      return [
+        `Situação da dengue no Brasil em 2024:`,
+        "• Casos confirmados: 6.1 milhões (até dezembro/2024)",
+        "• Óbitos confirmados: 5.967 casos",
+        "• Taxa de incidência: 2.915 casos por 100.000 habitantes",
+        "• Estados mais afetados: MG, SP, PR, SC, GO",
+        "• Sorotipo predominante: DENV-2 (67%) e DENV-1 (28%)"
+      ];
+    }
+    
+    if (lowercaseQuery.includes('vacinação') || lowercaseQuery.includes('cobertura vacinal')) {
+      return [
+        `Cobertura vacinal no Brasil em 2024:`,
+        "• Cobertura geral: 87.3% da população alvo",
+        "• Poliomielite: 89.2% (meta: 95%)",
+        "• Tríplice viral: 91.4% (meta: 95%)",
+        "• Pentavalente: 88.7% (meta: 95%)",
+        "• BCG: 94.1% (meta: 90%)",
+        "• Desafio: recuperar coberturas pré-pandemia"
+      ];
+    }
+    
+    // Resultado genérico para outras consultas
+    return [
+      `Indicadores de saúde relacionados a "${query}":`,
+      "• Taxa de mortalidade infantil: 12.4 por 1.000 nascidos vivos",
+      "• Taxa de mortalidade materna: 60 por 100.000 nascidos vivos",
+      "• Cobertura do pré-natal: 92.5% das gestantes",
+      "• Casos de dengue: 6.1 milhões em 2024",
+      "• Cobertura vacinal: 87.3% da população alvo"
+    ];
+  };
+
   const handleSearch = async () => {
     if (!query.trim()) {
       toast({
@@ -28,14 +87,7 @@ export const AISearch = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      const mockResults = [
-        `Indicadores relacionados a "${query}":`,
-        "• Taxa de mortalidade infantil: 12.4 por 1000 nascidos vivos",
-        "• Cobertura vacinal: 87.3% da população alvo",
-        "• Casos de dengue: 234 casos confirmados este mês",
-        "• Consultas preventivas: 4.567 consultas realizadas"
-      ];
-      
+      const mockResults = generateRelevantResults(query);
       setResults(mockResults);
       
       toast({
