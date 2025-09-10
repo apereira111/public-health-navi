@@ -15,11 +15,8 @@ const Analytics = () => {
             Utilize IA para análises inteligentes e coleta de dados automatizada
           </p>
         </div>
-        <div className="bg-card p-8 rounded-lg border">
-          <h2 className="text-2xl font-semibold mb-4">Teste de Componente</h2>
-          <p className="text-muted-foreground">
-            Esta página está carregando corretamente. Os componentes DataCollector e AISearch serão adicionados de volta.
-          </p>
+        <div className="space-y-12">
+          <AISearch />
         </div>
       </div>
     </div>
