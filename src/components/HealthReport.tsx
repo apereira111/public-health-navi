@@ -535,7 +535,7 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
       const imgHeight = canvas.height;
       
       // Configurações otimizadas para PDF com margens mínimas
-      const margin = 5; // Margem reduzida para 5mm para máximo aproveitamento da página
+      const margin = 2; // Margem mínima de 2mm para máximo aproveitamento da página
       const availableWidth = pdfWidth - (margin * 2);
       const availableHeight = pdfHeight - (margin * 2);
       
@@ -609,34 +609,36 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
             </div>
           </div>
 
-          <div id="health-report" className="space-y-8 bg-white p-8 rounded-lg" style={{
-            fontSize: '24px', // Aumentado drasticamente para melhor visualização no PDF
+          <div id="health-report" className="space-y-8 bg-white p-4 rounded-lg" style={{
+            fontSize: '28px', // Aumentado ainda mais para ocupar melhor a página
             lineHeight: '1.8',
             fontFamily: 'Arial, sans-serif',
-            maxWidth: '1000px', // Largura aumentada
-            margin: '0 auto',
-            color: '#000000', // Cor preta sólida para melhor impressão
-            fontWeight: '500' // Peso da fonte para melhor legibilidade
+            maxWidth: '100%', // Usar toda a largura disponível
+            width: '100%',
+            margin: '0',
+            padding: '20px',
+            color: '#000000',
+            fontWeight: '500'
           }}>
             {/* Cabeçalho do Relatório */}
             <div className="text-center border-b-2 pb-6 mb-8">
-              <h1 className="text-4xl font-bold text-gray-800 mb-4" style={{fontSize: '40px', color: '#000000', fontWeight: 'bold'}}>
+              <h1 className="text-4xl font-bold text-gray-800 mb-4" style={{fontSize: '48px', color: '#000000', fontWeight: 'bold'}}>
                 Relatório de Indicadores de Saúde
               </h1>
-              <p className="text-gray-600 text-lg mb-2" style={{fontSize: '26px', color: '#333333', fontWeight: '500'}}>
+              <p className="text-gray-600 text-lg mb-2" style={{fontSize: '32px', color: '#333333', fontWeight: '500'}}>
                 Consulta: "{data.query}"
               </p>
-              <p className="text-gray-500" style={{fontSize: '20px', color: '#555555'}}>
+              <p className="text-gray-500" style={{fontSize: '24px', color: '#555555'}}>
                 Gerado em: {new Date(data.timestamp).toLocaleString('pt-BR')}
               </p>
             </div>
 
             {/* Resumo Executivo */}
             <Card className="p-8 border-2 border-gray-200">
-              <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{fontSize: '30px', color: '#000000', fontWeight: 'bold'}}>📋 Resumo Executivo</h3>
+              <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{fontSize: '36px', color: '#000000', fontWeight: 'bold'}}>📋 Resumo Executivo</h3>
               <div className="space-y-6">
                 {analysis.executiveSummary && (
-                  <p className="text-gray-700 leading-relaxed text-justify bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500" style={{fontSize: '24px', color: '#000000', fontWeight: '400'}}>
+                  <p className="text-gray-700 leading-relaxed text-justify bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500" style={{fontSize: '28px', color: '#000000', fontWeight: '400'}}>
                     {analysis.executiveSummary}
                   </p>
                 )}
@@ -644,7 +646,7 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
                   {data.results.map((result, index) => (
                     <div key={index} className="flex items-start gap-3">
                       <span className="text-blue-600 font-bold text-lg">•</span>
-                      <p className="text-gray-700 leading-relaxed" style={{fontSize: '24px', color: '#000000', fontWeight: '400'}}>{result}</p>
+                      <p className="text-gray-700 leading-relaxed" style={{fontSize: '28px', color: '#000000', fontWeight: '400'}}>{result}</p>
                     </div>
                   ))}
                 </div>
@@ -654,8 +656,8 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
             {/* Visualização de Dados */}
             {chartData && chartData.length > 0 && chartData.map((chart, index) => (
               <Card key={index} className="p-8 border-2 border-gray-200">
-                <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{fontSize: '30px', color: '#000000', fontWeight: 'bold'}}>📊 {chart.title}</h3>
-                <div style={{fontSize: '20px'}}>
+                <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{fontSize: '36px', color: '#000000', fontWeight: 'bold'}}>📊 {chart.title}</h3>
+                <div style={{fontSize: '24px'}}>
                   {renderChart(chart)}
                 </div>
               </Card>
@@ -664,21 +666,21 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
             {/* Tabelas de Dados Detalhados */}
             {chartData && chartData.length > 0 && (
               <Card className="p-8 border-2 border-gray-200">
-                <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{fontSize: '30px', color: '#000000', fontWeight: 'bold'}}>📈 Resumo Quantitativo Consolidado</h3>
-                <div className="grid grid-cols-1 gap-8" style={{fontSize: '20px'}}>
+                <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{fontSize: '36px', color: '#000000', fontWeight: 'bold'}}>📈 Resumo Quantitativo Consolidado</h3>
+                <div className="grid grid-cols-1 gap-8" style={{fontSize: '24px'}}>
                   
                   {/* Tabela Mortalidade Materna */}
                   <div className="space-y-4 mb-8">
-                    <h4 className="font-semibold text-gray-800 text-lg" style={{fontSize: '28px', color: '#000000', fontWeight: 'bold'}}>Mortalidade Materna por Região (2024)</h4>
+                    <h4 className="font-semibold text-gray-800 text-lg" style={{fontSize: '32px', color: '#000000', fontWeight: 'bold'}}>Mortalidade Materna por Região (2024)</h4>
                     <div className="overflow-x-auto">
-                      <table className="w-full border-collapse border-2 border-gray-300" style={{fontSize: '22px', color: '#000000', fontWeight: '500'}}>
+                      <table className="w-full border-collapse border-2 border-gray-300" style={{fontSize: '26px', color: '#000000', fontWeight: '500'}}>
                         <thead>
                           <tr className="bg-gray-100">
-                            <th className="border border-gray-300 p-4 text-left font-semibold">Região</th>
-                            <th className="border border-gray-300 p-4 text-center font-semibold">Taxa Atual</th>
-                            <th className="border border-gray-300 p-4 text-center font-semibold">Meta ODS</th>
-                            <th className="border border-gray-300 p-4 text-center font-semibold">Gap</th>
-                            <th className="border border-gray-300 p-4 text-center font-semibold">Ranking</th>
+                            <th className="border border-gray-300 p-5 text-left font-semibold">Região</th>
+                            <th className="border border-gray-300 p-5 text-center font-semibold">Taxa Atual</th>
+                            <th className="border border-gray-300 p-5 text-center font-semibold">Meta ODS</th>
+                            <th className="border border-gray-300 p-5 text-center font-semibold">Gap</th>
+                            <th className="border border-gray-300 p-5 text-center font-semibold">Ranking</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -794,14 +796,14 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
 
             {/* Análise Crítica */}
             <Card className="p-6">
-              <h3 className="text-xl font-semibold mb-4 text-gray-800" style={{fontSize: '30px', color: '#000000', fontWeight: 'bold'}}>🔍 {analysis.title}</h3>
+              <h3 className="text-xl font-semibold mb-4 text-gray-800" style={{fontSize: '36px', color: '#000000', fontWeight: 'bold'}}>🔍 {analysis.title}</h3>
               <div className="space-y-8">
                 {analysis.sections.map((section, index) => (
                   <div key={index} className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="text-lg font-semibold mb-3 text-gray-800 border-b border-gray-300 pb-2" style={{fontSize: '26px', color: '#000000', fontWeight: 'bold'}}>
+                    <h4 className="text-lg font-semibold mb-3 text-gray-800 border-b border-gray-300 pb-2" style={{fontSize: '30px', color: '#000000', fontWeight: 'bold'}}>
                       {section.title}
                     </h4>
-                    <div className="text-gray-700 leading-relaxed text-justify whitespace-pre-line" style={{fontSize: '22px', color: '#000000'}}>
+                    <div className="text-gray-700 leading-relaxed text-justify whitespace-pre-line" style={{fontSize: '26px', color: '#000000'}}>
                       {section.content}
                     </div>
                   </div>
@@ -858,25 +860,25 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
 
             {/* Conclusões e Próximos Passos */}
             <Card className="p-6">
-              <h3 className="text-xl font-semibold mb-4 text-gray-800" style={{fontSize: '30px', color: '#000000', fontWeight: 'bold'}}>📋 Conclusões e Próximos Passos</h3>
+              <h3 className="text-xl font-semibold mb-4 text-gray-800" style={{fontSize: '36px', color: '#000000', fontWeight: 'bold'}}>📋 Conclusões e Próximos Passos</h3>
               <div className="space-y-4">
                 <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
-                  <h4 className="font-semibold text-green-800 mb-2" style={{fontSize: '24px', color: '#2d5016', fontWeight: 'bold'}}>Pontos Positivos</h4>
-                  <p className="text-green-700" style={{fontSize: '22px', color: '#2d5016'}}>
+                  <h4 className="font-semibold text-green-800 mb-2" style={{fontSize: '28px', color: '#2d5016', fontWeight: 'bold'}}>Pontos Positivos</h4>
+                  <p className="text-green-700" style={{fontSize: '26px', color: '#2d5016'}}>
                     Observa-se tendência consistente de redução nos indicadores de mortalidade materna e infantil, 
                     demonstrando efetividade das políticas implementadas nos últimos anos.
                   </p>
                 </div>
                 <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
-                  <h4 className="font-semibold text-yellow-800 mb-2" style={{fontSize: '24px', color: '#854d0e', fontWeight: 'bold'}}>Desafios Identificados</h4>
-                  <p className="text-yellow-700" style={{fontSize: '22px', color: '#854d0e'}}>
+                  <h4 className="font-semibold text-yellow-800 mb-2" style={{fontSize: '28px', color: '#854d0e', fontWeight: 'bold'}}>Desafios Identificados</h4>
+                  <p className="text-yellow-700" style={{fontSize: '26px', color: '#854d0e'}}>
                     As desigualdades regionais permanecem como principal obstáculo para o atingimento das metas ODS, 
                     exigindo estratégias direcionadas e investimentos priorizados.
                   </p>
                 </div>
                 <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                  <h4 className="font-semibold text-blue-800 mb-2" style={{fontSize: '24px', color: '#1e3a8a', fontWeight: 'bold'}}>Próximas Ações</h4>
-                  <p className="text-blue-700" style={{fontSize: '22px', color: '#1e3a8a'}}>
+                  <h4 className="font-semibold text-blue-800 mb-2" style={{fontSize: '28px', color: '#1e3a8a', fontWeight: 'bold'}}>Próximas Ações</h4>
+                  <p className="text-blue-700" style={{fontSize: '26px', color: '#1e3a8a'}}>
                     É fundamental manter o monitoramento contínuo dos indicadores e implementar as recomendações 
                     prioritárias para acelerar o progresso em direção às metas estabelecidas.
                   </p>
@@ -886,15 +888,15 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
 
             {/* Metodologia */}
             <Card className="p-6">
-              <h3 className="text-xl font-semibold mb-4 text-gray-800" style={{fontSize: '30px', color: '#000000', fontWeight: 'bold'}}>📚 Metodologia e Fontes de Dados</h3>
+              <h3 className="text-xl font-semibold mb-4 text-gray-800" style={{fontSize: '36px', color: '#000000', fontWeight: 'bold'}}>📚 Metodologia e Fontes de Dados</h3>
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-semibold text-gray-800 mb-2" style={{fontSize: '24px', color: '#000000', fontWeight: 'bold'}}>Fontes de Dados</h4>
-                  <p className="text-gray-700 leading-relaxed text-justify mb-3" style={{fontSize: '22px', color: '#000000'}}>
+                  <h4 className="font-semibold text-gray-800 mb-2" style={{fontSize: '28px', color: '#000000', fontWeight: 'bold'}}>Fontes de Dados</h4>
+                  <p className="text-gray-700 leading-relaxed text-justify mb-3" style={{fontSize: '26px', color: '#000000'}}>
                     Os dados apresentados neste relatório são baseados em informações dos sistemas oficiais 
                     de saúde do Brasil, garantindo confiabilidade e padronização das informações:
                   </p>
-                  <ul className="space-y-2 text-gray-700 ml-4" style={{fontSize: '22px', color: '#000000'}}>
+                  <ul className="space-y-2 text-gray-700 ml-4" style={{fontSize: '26px', color: '#000000'}}>
                     <li>• <strong>SIM</strong> (Sistema de Informações sobre Mortalidade): registro oficial de óbitos</li>
                     <li>• <strong>SINASC</strong> (Sistema de Informações sobre Nascidos Vivos): dados de nascimentos</li>
                     <li>• <strong>SINAN</strong> (Sistema de Informação de Agravos de Notificação): doenças e agravos</li>
@@ -903,9 +905,9 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
                 </div>
                 
                 <div>
-                  <h4 className="font-semibold text-gray-800 mb-2" style={{fontSize: '24px', color: '#000000', fontWeight: 'bold'}}>Definições e Indicadores</h4>
+                  <h4 className="font-semibold text-gray-800 mb-2" style={{fontSize: '28px', color: '#000000', fontWeight: 'bold'}}>Definições e Indicadores</h4>
                   <div className="bg-gray-50 p-3 rounded">
-                    <p className="text-gray-700 text-sm" style={{fontSize: '20px', color: '#000000'}}>
+                    <p className="text-gray-700 text-sm" style={{fontSize: '24px', color: '#000000'}}>
                       <strong>Taxa de Mortalidade Materna:</strong> Número de óbitos maternos por 100.000 nascidos vivos<br/>
                       <strong>Taxa de Mortalidade Infantil:</strong> Número de óbitos de menores de 1 ano por 1.000 nascidos vivos<br/>
                       <strong>Meta ODS 3.1:</strong> Reduzir mortalidade materna para menos de 30/100.000 até 2030<br/>
@@ -915,8 +917,8 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
                 </div>
                 
                 <div>
-                  <h4 className="font-semibold text-gray-800 mb-2" style={{fontSize: '24px', color: '#000000', fontWeight: 'bold'}}>Limitações e Considerações</h4>
-                  <p className="text-gray-700 leading-relaxed text-justify" style={{fontSize: '22px', color: '#000000'}}>
+                  <h4 className="font-semibold text-gray-800 mb-2" style={{fontSize: '28px', color: '#000000', fontWeight: 'bold'}}>Limitações e Considerações</h4>
+                  <p className="text-gray-700 leading-relaxed text-justify" style={{fontSize: '26px', color: '#000000'}}>
                     É importante considerar que os dados podem apresentar variações devido a: (1) diferenças 
                     metodológicas entre sistemas de informação; (2) possível subnotificação em algumas regiões; 
                     (3) variações na qualidade do preenchimento das declarações; (4) diferenças temporais na 
@@ -925,8 +927,8 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
                 </div>
                 
                 <div>
-                  <h4 className="font-semibold text-gray-800 mb-2" style={{fontSize: '24px', color: '#000000', fontWeight: 'bold'}}>Referências Técnicas</h4>
-                  <p className="text-gray-700 text-sm" style={{fontSize: '20px', color: '#000000'}}>
+                  <h4 className="font-semibold text-gray-800 mb-2" style={{fontSize: '28px', color: '#000000', fontWeight: 'bold'}}>Referências Técnicas</h4>
+                  <p className="text-gray-700 text-sm" style={{fontSize: '24px', color: '#000000'}}>
                     As análises seguem as diretrizes da Organização Mundial da Saúde (OMS), do Ministério da Saúde 
                     do Brasil e dos Objetivos de Desenvolvimento Sustentável da Agenda 2030 das Nações Unidas.
                   </p>
@@ -935,7 +937,7 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
             </Card>
 
             {/* Rodapé */}
-            <div className="text-center pt-4 border-t text-sm text-gray-500" style={{fontSize: '18px', color: '#666666'}}>
+            <div className="text-center pt-4 border-t text-sm text-gray-500" style={{fontSize: '22px', color: '#666666'}}>
               <p style={{fontWeight: '500'}}>Sistema de Análise de Indicadores de Saúde | Ministério da Saúde - Brasil</p>
               <p>Relatório gerado automaticamente via Inteligência Artificial</p>
             </div>
