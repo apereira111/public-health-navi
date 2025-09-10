@@ -6,6 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Sparkles, TrendingUp, Calendar, MapPin, Building2, CalendarDays } from "lucide-react";
 
 export const AISearch = () => {
+  console.log('AISearch component rendering');
+  
   const [query, setQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [selectedState, setSelectedState] = useState("");

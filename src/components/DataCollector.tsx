@@ -12,6 +12,8 @@ interface DataCollectorProps {
 }
 
 export const DataCollector: React.FC<DataCollectorProps> = ({ onDataUpdate }) => {
+  console.log('DataCollector component rendering');
+  
   const [isCollecting, setIsCollecting] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [status, setStatus] = useState<'idle' | 'collecting' | 'success' | 'error'>('idle');
