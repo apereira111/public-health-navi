@@ -161,21 +161,6 @@ const Auth = () => {
                 Continuar com Google
               </Button>
               
-              <Button
-                variant="ghost"
-                className="w-full text-xs"
-                onClick={async () => {
-                  console.log('Verificando sessão...');
-                  const { data } = await supabase.auth.getSession();
-                  console.log('Sessão atual:', data);
-                  if (data.session) {
-                    console.log('Sessão encontrada, forçando redirect...');
-                    window.location.href = '/';
-                  }
-                }}
-              >
-                🔄 Verificar se há sessão ativa
-              </Button>
             </div>
 
             <div className="mt-4 text-center">

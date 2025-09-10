@@ -77,6 +77,10 @@ export const Reports = () => {
                   <Button 
                     variant="outline" 
                     className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors"
+                    onClick={() => {
+                      // TODO: Implement report generation
+                      alert(`Gerando ${template.title}... Esta funcionalidade será implementada em breve!`);
+                    }}
                   >
                     <Download className="h-4 w-4 mr-2" />
                     Gerar Relatório
