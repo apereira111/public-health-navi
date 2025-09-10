@@ -513,12 +513,17 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
         description: "Processando o relatório..."
       });
 
+      // Configurações otimizadas para PDF com texto nítido
       const canvas = await html2canvas(reportElement, {
-        scale: 3, // Aumentado de 2 para 3 para melhor qualidade de texto
+        scale: 4, // Aumentado para 4 para máxima qualidade de texto
         useCORS: true,
         allowTaint: true,
+        backgroundColor: '#ffffff',
         width: reportElement.scrollWidth,
-        height: reportElement.scrollHeight
+        height: reportElement.scrollHeight,
+        logging: false,
+        imageTimeout: 0,
+        removeContainer: false
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -529,8 +534,8 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
       
-      // Reduzir margens laterais e melhorar o uso do espaço
-      const margin = 10; // Margem reduzida de 20 para 10
+      // Configurações otimizadas para PDF com margens mínimas
+      const margin = 5; // Margem reduzida para 5mm para máximo aproveitamento da página
       const availableWidth = pdfWidth - (margin * 2);
       const availableHeight = pdfHeight - (margin * 2);
       
@@ -605,31 +610,32 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
           </div>
 
           <div id="health-report" className="space-y-8 bg-white p-8 rounded-lg" style={{
-            fontSize: '16px', // Tamanho base maior
-            lineHeight: '1.6',
+            fontSize: '18px', // Aumentado para texto mais visível no PDF
+            lineHeight: '1.7',
             fontFamily: 'Arial, sans-serif',
-            maxWidth: '800px', // Largura otimizada para PDF
-            margin: '0 auto'
+            maxWidth: '900px', // Largura aumentada para melhor uso do espaço PDF
+            margin: '0 auto',
+            color: '#000000' // Cor preta sólida para melhor impressão
           }}>
             {/* Cabeçalho do Relatório */}
             <div className="text-center border-b-2 pb-6 mb-8">
-              <h1 className="text-4xl font-bold text-gray-800 mb-4" style={{fontSize: '28px'}}>
+              <h1 className="text-4xl font-bold text-gray-800 mb-4" style={{fontSize: '32px', color: '#000000'}}>
                 Relatório de Indicadores de Saúde
               </h1>
-              <p className="text-gray-600 text-lg mb-2" style={{fontSize: '18px'}}>
+              <p className="text-gray-600 text-lg mb-2" style={{fontSize: '20px', color: '#333333'}}>
                 Consulta: "{data.query}"
               </p>
-              <p className="text-gray-500" style={{fontSize: '14px'}}>
+              <p className="text-gray-500" style={{fontSize: '16px', color: '#555555'}}>
                 Gerado em: {new Date(data.timestamp).toLocaleString('pt-BR')}
               </p>
             </div>
 
             {/* Resumo Executivo */}
             <Card className="p-8 border-2 border-gray-200">
-              <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{fontSize: '22px'}}>📋 Resumo Executivo</h3>
+              <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{fontSize: '24px', color: '#000000'}}>📋 Resumo Executivo</h3>
               <div className="space-y-6">
                 {analysis.executiveSummary && (
-                  <p className="text-gray-700 leading-relaxed text-justify bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500" style={{fontSize: '16px'}}>
+                  <p className="text-gray-700 leading-relaxed text-justify bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500" style={{fontSize: '18px', color: '#000000'}}>
                     {analysis.executiveSummary}
                   </p>
                 )}
@@ -637,7 +643,7 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
                   {data.results.map((result, index) => (
                     <div key={index} className="flex items-start gap-3">
                       <span className="text-blue-600 font-bold text-lg">•</span>
-                      <p className="text-gray-700 leading-relaxed" style={{fontSize: '16px'}}>{result}</p>
+                      <p className="text-gray-700 leading-relaxed" style={{fontSize: '18px', color: '#000000'}}>{result}</p>
                     </div>
                   ))}
                 </div>
@@ -647,8 +653,8 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
             {/* Visualização de Dados */}
             {chartData && chartData.length > 0 && chartData.map((chart, index) => (
               <Card key={index} className="p-8 border-2 border-gray-200">
-                <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{fontSize: '22px'}}>📊 {chart.title}</h3>
-                <div style={{fontSize: '14px'}}>
+                <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{fontSize: '24px', color: '#000000'}}>📊 {chart.title}</h3>
+                <div style={{fontSize: '16px'}}>
                   {renderChart(chart)}
                 </div>
               </Card>
@@ -657,14 +663,14 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
             {/* Tabelas de Dados Detalhados */}
             {chartData && chartData.length > 0 && (
               <Card className="p-8 border-2 border-gray-200">
-                <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{fontSize: '22px'}}>📈 Resumo Quantitativo Consolidado</h3>
-                <div className="grid grid-cols-1 gap-8" style={{fontSize: '14px'}}>
+                <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{fontSize: '24px', color: '#000000'}}>📈 Resumo Quantitativo Consolidado</h3>
+                <div className="grid grid-cols-1 gap-8" style={{fontSize: '16px'}}>
                   
                   {/* Tabela Mortalidade Materna */}
                   <div className="space-y-4 mb-8">
-                    <h4 className="font-semibold text-gray-800 text-lg" style={{fontSize: '20px'}}>Mortalidade Materna por Região (2024)</h4>
+                    <h4 className="font-semibold text-gray-800 text-lg" style={{fontSize: '22px', color: '#000000'}}>Mortalidade Materna por Região (2024)</h4>
                     <div className="overflow-x-auto">
-                      <table className="w-full border-collapse border-2 border-gray-300" style={{fontSize: '15px'}}>
+                      <table className="w-full border-collapse border-2 border-gray-300" style={{fontSize: '17px', color: '#000000'}}>
                         <thead>
                           <tr className="bg-gray-100">
                             <th className="border border-gray-300 p-4 text-left font-semibold">Região</th>
