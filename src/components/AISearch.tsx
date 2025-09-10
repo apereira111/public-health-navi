@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { HealthReport } from "./HealthReport";
 
 export const AISearch = () => {
   console.log('AISearch component rendering - basic version');
@@ -10,6 +11,8 @@ export const AISearch = () => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [reportData, setReportData] = useState<{query: string, results: string[], timestamp: string} | null>(null);
   const { toast } = useToast();
 
   const generateRelevantResults = (query: string): string[] => {
@@ -116,6 +119,13 @@ export const AISearch = () => {
         title: "Busca concluída",
         description: "Encontrados dados relacionados à sua consulta."
       });
+      
+      // Preparar dados para o relatório
+      setReportData({
+        query: query,
+        results: mockResults,
+        timestamp: new Date().toISOString()
+      });
     } catch (error) {
       toast({
         title: "Erro na busca",
@@ -124,6 +134,18 @@ export const AISearch = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const generateReport = () => {
+    if (reportData) {
+      setShowReport(true);
+    } else {
+      toast({
+        title: "Nenhum dado disponível",
+        description: "Faça uma busca primeiro para gerar o relatório.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -157,7 +179,12 @@ export const AISearch = () => {
         
         {results.length > 0 && (
           <div className="mt-6 p-4 bg-muted rounded-lg">
-            <h3 className="font-semibold mb-3">Resultados da busca:</h3>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-semibold">Resultados da busca:</h3>
+              <Button onClick={generateReport} variant="default" size="sm">
+                📊 Gerar Relatório Profissional
+              </Button>
+            </div>
             <div className="space-y-2">
               {results.map((result, index) => (
                 <p key={index} className="text-sm">
@@ -176,6 +203,13 @@ export const AISearch = () => {
           </div>
         )}
       </Card>
+      
+      {showReport && reportData && (
+        <HealthReport 
+          data={reportData} 
+          onClose={() => setShowReport(false)} 
+        />
+      )}
     </div>
   );
 };
