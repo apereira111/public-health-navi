@@ -104,7 +104,7 @@ const Auth = () => {
       <div className="w-full max-w-md">
         <Card>
           <CardHeader>
-            <CardTitle>HealthDash</CardTitle>
+            <CardTitle>Gestão +</CardTitle>
             <CardDescription>
               {isSignUp ? 'Crie sua conta para continuar' : 'Faça login para continuar'}
             </CardDescription>
