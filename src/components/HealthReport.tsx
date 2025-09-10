@@ -514,9 +514,11 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
       });
 
       const canvas = await html2canvas(reportElement, {
-        scale: 2,
+        scale: 3, // Aumentado de 2 para 3 para melhor qualidade de texto
         useCORS: true,
-        allowTaint: true
+        allowTaint: true,
+        width: reportElement.scrollWidth,
+        height: reportElement.scrollHeight
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -526,11 +528,49 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
       const pdfHeight = pdf.internal.pageSize.getHeight();
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 10;
+      
+      // Reduzir margens laterais e melhorar o uso do espaço
+      const margin = 10; // Margem reduzida de 20 para 10
+      const availableWidth = pdfWidth - (margin * 2);
+      const availableHeight = pdfHeight - (margin * 2);
+      
+      const ratio = Math.min(availableWidth / imgWidth, availableHeight / imgHeight);
+      const scaledWidth = imgWidth * ratio;
+      const scaledHeight = imgHeight * ratio;
+      
+      const imgX = margin;
+      const imgY = margin;
 
-      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      // Se a imagem for muito alta, dividir em páginas
+      const pageHeight = pdfHeight - (margin * 2);
+      let remainingHeight = scaledHeight;
+      let currentY = 0;
+      let pageNumber = 1;
+
+      while (remainingHeight > 0) {
+        if (pageNumber > 1) {
+          pdf.addPage();
+        }
+        
+        const heightToAdd = Math.min(pageHeight, remainingHeight);
+        const sourceY = currentY * (imgHeight / scaledHeight);
+        const sourceHeight = heightToAdd * (imgHeight / scaledHeight);
+        
+        // Criar canvas temporário para esta seção
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCanvas.width = imgWidth;
+        tempCanvas.height = sourceHeight;
+        
+        tempCtx?.drawImage(canvas, 0, sourceY, imgWidth, sourceHeight, 0, 0, imgWidth, sourceHeight);
+        const tempImgData = tempCanvas.toDataURL('image/png');
+        
+        pdf.addImage(tempImgData, 'PNG', imgX, imgY, scaledWidth, heightToAdd);
+        
+        remainingHeight -= heightToAdd;
+        currentY += heightToAdd;
+        pageNumber++;
+      }
       
       const fileName = `relatorio-saude-${new Date().toISOString().split('T')[0]}.pdf`;
       pdf.save(fileName);
@@ -564,34 +604,40 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
             </div>
           </div>
 
-          <div id="health-report" className="space-y-6 bg-white p-6 rounded">
+          <div id="health-report" className="space-y-8 bg-white p-8 rounded-lg" style={{
+            fontSize: '16px', // Tamanho base maior
+            lineHeight: '1.6',
+            fontFamily: 'Arial, sans-serif',
+            maxWidth: '800px', // Largura otimizada para PDF
+            margin: '0 auto'
+          }}>
             {/* Cabeçalho do Relatório */}
-            <div className="text-center border-b pb-4 mb-6">
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            <div className="text-center border-b-2 pb-6 mb-8">
+              <h1 className="text-4xl font-bold text-gray-800 mb-4" style={{fontSize: '28px'}}>
                 Relatório de Indicadores de Saúde
               </h1>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-lg mb-2" style={{fontSize: '18px'}}>
                 Consulta: "{data.query}"
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-gray-500" style={{fontSize: '14px'}}>
                 Gerado em: {new Date(data.timestamp).toLocaleString('pt-BR')}
               </p>
             </div>
 
             {/* Resumo Executivo */}
-            <Card className="p-6">
-              <h3 className="text-xl font-semibold mb-4 text-gray-800">📋 Resumo Executivo</h3>
-              <div className="space-y-4">
+            <Card className="p-8 border-2 border-gray-200">
+              <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{fontSize: '22px'}}>📋 Resumo Executivo</h3>
+              <div className="space-y-6">
                 {analysis.executiveSummary && (
-                  <p className="text-gray-700 leading-relaxed text-justify bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                  <p className="text-gray-700 leading-relaxed text-justify bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500" style={{fontSize: '16px'}}>
                     {analysis.executiveSummary}
                   </p>
                 )}
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {data.results.map((result, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <span className="text-blue-600 font-bold">•</span>
-                      <p className="text-gray-700 leading-relaxed">{result}</p>
+                    <div key={index} className="flex items-start gap-3">
+                      <span className="text-blue-600 font-bold text-lg">•</span>
+                      <p className="text-gray-700 leading-relaxed" style={{fontSize: '16px'}}>{result}</p>
                     </div>
                   ))}
                 </div>
@@ -600,30 +646,32 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
 
             {/* Visualização de Dados */}
             {chartData && chartData.length > 0 && chartData.map((chart, index) => (
-              <Card key={index} className="p-6">
-                <h3 className="text-xl font-semibold mb-4 text-gray-800">📊 {chart.title}</h3>
-                {renderChart(chart)}
+              <Card key={index} className="p-8 border-2 border-gray-200">
+                <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{fontSize: '22px'}}>📊 {chart.title}</h3>
+                <div style={{fontSize: '14px'}}>
+                  {renderChart(chart)}
+                </div>
               </Card>
             ))}
 
             {/* Tabelas de Dados Detalhados */}
             {chartData && chartData.length > 0 && (
-              <Card className="p-6">
-                <h3 className="text-xl font-semibold mb-4 text-gray-800">📈 Resumo Quantitativo Consolidado</h3>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="p-8 border-2 border-gray-200">
+                <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{fontSize: '22px'}}>📈 Resumo Quantitativo Consolidado</h3>
+                <div className="grid grid-cols-1 gap-8" style={{fontSize: '14px'}}>
                   
                   {/* Tabela Mortalidade Materna */}
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-gray-800">Mortalidade Materna por Região (2024)</h4>
+                  <div className="space-y-4 mb-8">
+                    <h4 className="font-semibold text-gray-800 text-lg" style={{fontSize: '20px'}}>Mortalidade Materna por Região (2024)</h4>
                     <div className="overflow-x-auto">
-                      <table className="w-full border-collapse border border-gray-300 text-sm">
+                      <table className="w-full border-collapse border-2 border-gray-300" style={{fontSize: '15px'}}>
                         <thead>
                           <tr className="bg-gray-100">
-                            <th className="border border-gray-300 p-2 text-left">Região</th>
-                            <th className="border border-gray-300 p-2 text-center">Taxa Atual</th>
-                            <th className="border border-gray-300 p-2 text-center">Meta ODS</th>
-                            <th className="border border-gray-300 p-2 text-center">Gap</th>
-                            <th className="border border-gray-300 p-2 text-center">Ranking</th>
+                            <th className="border border-gray-300 p-4 text-left font-semibold">Região</th>
+                            <th className="border border-gray-300 p-4 text-center font-semibold">Taxa Atual</th>
+                            <th className="border border-gray-300 p-4 text-center font-semibold">Meta ODS</th>
+                            <th className="border border-gray-300 p-4 text-center font-semibold">Gap</th>
+                            <th className="border border-gray-300 p-4 text-center font-semibold">Ranking</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -635,10 +683,10 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
                             { name: 'Sul', value: 42, target: 30, ranking: '1º' }
                           ].map((item, index) => (
                             <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                              <td className="border border-gray-300 p-2 font-medium">{item.name}</td>
-                              <td className="border border-gray-300 p-2 text-center">{item.value}/100k</td>
-                              <td className="border border-gray-300 p-2 text-center text-green-600">{item.target}/100k</td>
-                              <td className="border border-gray-300 p-2 text-center text-red-600 font-medium">
+                              <td className="border border-gray-300 p-4 font-medium">{item.name}</td>
+                              <td className="border border-gray-300 p-4 text-center">{item.value}/100k</td>
+                              <td className="border border-gray-300 p-4 text-center text-green-600">{item.target}/100k</td>
+                              <td className="border border-gray-300 p-4 text-center text-red-600 font-medium">
                                 +{item.value - item.target}
                               </td>
                               <td className="border border-gray-300 p-2 text-center font-medium">{item.ranking}</td>
