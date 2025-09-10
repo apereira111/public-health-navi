@@ -2,78 +2,72 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Download, Sparkles, Calendar, TrendingUp } from "lucide-react";
+import { FileText, Download, Sparkles, Calendar, TrendingUp, Heart, Baby, Users, Stethoscope, Brain, Shield, Activity } from "lucide-react";
 import { HealthReport } from "./HealthReport";
+import { allPanels } from "@/data/mockdata";
+
+// Gerar templates baseados nos painéis disponíveis
+const generateReportTemplates = () => {
+  const iconMap: Record<string, any> = {
+    "primary-care": Stethoscope,
+    "financing": TrendingUp,
+    "child-health": Baby,
+    "womens-health": Heart,
+    "epidemiology": Shield,
+    "chronic-diseases": Activity,
+    "oral-health": FileText,
+    "elderly-health": Users,
+    "mental-health": Brain
+  };
+
+  const frequencyMap: Record<string, string> = {
+    "primary-care": "Mensal",
+    "financing": "Trimestral", 
+    "child-health": "Mensal",
+    "womens-health": "Trimestral",
+    "epidemiology": "Semanal",
+    "chronic-diseases": "Mensal",
+    "oral-health": "Trimestral",
+    "elderly-health": "Mensal",
+    "mental-health": "Trimestral"
+  };
+
+  return allPanels.map(panel => ({
+    title: `Relatório de ${panel.title}`,
+    description: `${panel.description} Análise comparativa 2023-2024 com recomendações.`,
+    type: "Relatório Especializado",
+    frequency: frequencyMap[panel.id || ""] || "Mensal",
+    icon: iconMap[panel.id || ""] || FileText,
+    panelId: panel.id
+  }));
+};
 
 const reportTemplates = [
   {
-    title: "Resumo Mensal de Saúde",
-    description: "Visão abrangente dos principais indicadores de saúde com análise de tendências",
+    title: "Resumo Executivo Geral",
+    description: "Visão abrangente de todos os indicadores de saúde com análise comparativa 2023-2024",
     type: "Resumo Executivo",
     frequency: "Mensal",
     icon: Calendar,
+    panelId: "general"
   },
-  {
-    title: "Relatório de Saúde Materna",
-    description: "Análise detalhada da mortalidade materna, cuidados pré-natais e resultados de nascimento",
-    type: "Relatório Especializado",
-    frequency: "Trimestral",
-    icon: FileText,
-  },
-  {
-    title: "Relatório de Vigilância de Doenças",
-    description: "Rastreamento em tempo real de doenças infecciosas e padrões de surtos",
-    type: "Vigilância",
-    frequency: "Semanal",
-    icon: TrendingUp,
-  },
+  ...generateReportTemplates()
 ];
 
 export const Reports = () => {
   const [showReport, setShowReport] = useState(false);
   const [reportData, setReportData] = useState<{query: string, results: string[], timestamp: string} | null>(null);
 
-  const generateReportData = (templateTitle: string) => {
+  const generateReportData = (templateTitle: string, panelId?: string) => {
     const timestamp = new Date().toISOString();
+    const currentYear = new Date().getFullYear();
+    const previousYear = currentYear - 1;
     
-    if (templateTitle === "Relatório de Saúde Materna") {
+    if (templateTitle === "Resumo Executivo Geral") {
       return {
-        query: "Relatório detalhado sobre mortalidade materna e cuidados pré-natais no Brasil em 2024",
+        query: `Resumo executivo geral dos indicadores de saúde do Brasil - ${currentYear}`,
         results: [
-          "📊 MORTALIDADE MATERNA NO BRASIL - 2024:",
-          "",
-          "• Taxa atual: 60 óbitos por 100.000 nascidos vivos",
-          "• Meta ODS 2030: 30 óbitos por 100.000 nascidos vivos",
-          "• Situação: 100% acima da meta estabelecida",
-          "",
-          "🏥 PRINCIPAIS CAUSAS DE MORTALIDADE MATERNA:",
-          "• Hipertensão arterial: 37% dos casos",
-          "• Hemorragia obstétrica: 11% dos casos", 
-          "• Infecção puerperal: 8% dos casos",
-          "• Embolia: 6% dos casos",
-          "",
-          "📈 EVOLUÇÃO TEMPORAL:",
-          "• 2023: 68 óbitos/100.000 nascidos vivos",
-          "• 2024: 60 óbitos/100.000 nascidos vivos",
-          "• Redução: 12% em relação ao ano anterior",
-          "",
-          "🗺️ DISTRIBUIÇÃO REGIONAL:",
-          "• Região Norte: 89 óbitos/100.000 (mais crítica)",
-          "• Região Nordeste: 71 óbitos/100.000",
-          "• Região Sul: 45 óbitos/100.000 (melhor índice)",
-          "",
-          "🤱 CUIDADOS PRÉ-NATAIS:",
-          "• Cobertura nacional: 89.2% das gestantes",
-          "• Meta recomendada: 95% de cobertura",
-          "• Consultas adequadas (≥6): 78% das gestantes"
-        ],
-        timestamp
-      };
-    } else if (templateTitle === "Resumo Mensal de Saúde") {
-      return {
-        query: "Resumo executivo dos principais indicadores de saúde do Brasil - Dezembro 2024",
-        results: [
-          "📊 RESUMO EXECUTIVO - DEZEMBRO 2024:",
+          `📊 RESUMO EXECUTIVO GERAL - ${currentYear}:`,
           "",
           "🔴 INDICADORES CRÍTICOS:",
           "• Mortalidade materna: 60/100.000 (meta: 30/100.000)",
@@ -90,45 +84,61 @@ export const Reports = () => {
           "• Redução de 8% na mortalidade infantil",
           "• Aumento de 15% na cobertura de ESF rural",
           "",
-          "📈 TENDÊNCIAS DO ANO:",
+          `📈 ANÁLISE COMPARATIVA ${previousYear}-${currentYear}:`,
           "• Melhoria geral nos indicadores materno-infantis",
           "• Desafios persistentes em doenças infecciosas",
-          "• Necessidade de fortalecimento da vigilância epidemiológica"
+          "• Fortalecimento necessário da vigilância epidemiológica",
+          "",
+          "🎯 RECOMENDAÇÕES PRIORITÁRIAS:",
+          "• Intensificar controle vetorial da dengue",
+          "• Expandir cobertura de ESF em áreas rurais",
+          "• Melhorar qualidade do pré-natal",
+          "• Fortalecer rede de urgência obstétrica"
         ],
         timestamp
       };
-    } else if (templateTitle === "Relatório de Vigilância de Doenças") {
+    }
+    
+    // Gerar relatórios específicos por painel
+    const panel = allPanels.find(p => p.id === panelId);
+    if (panel) {
       return {
-        query: "Relatório de vigilância epidemiológica - Doenças infecciosas Brasil 2024",
+        query: `Relatório detalhado de ${panel.title} - Análise comparativa ${previousYear}-${currentYear}`,
         results: [
-          "🦠 VIGILÂNCIA EPIDEMIOLÓGICA - SEMANA 50/2024:",
+          `📊 RELATÓRIO DE ${panel.title.toUpperCase()} - ${currentYear}:`,
           "",
-          "🔴 ALERTAS CRÍTICOS:",
-          "• Dengue: 6.1 milhões de casos (+180% vs 2023)",
-          "• Chikungunya: 315.000 casos (+45% vs 2023)",
-          "• Zika: 12.500 casos (estável)",
+          `📋 DESCRIÇÃO: ${panel.description}`,
           "",
-          "📍 DISTRIBUIÇÃO GEOGRÁFICA - DENGUE:",
-          "• Minas Gerais: 1.8 milhões de casos",
-          "• São Paulo: 1.2 milhões de casos",
-          "• Paraná: 890.000 casos",
-          "• Santa Catarina: 650.000 casos",
+          "🔢 INDICADORES PRINCIPAIS:",
+          ...panel.kpis.slice(0, 4).map(kpi => 
+            `• ${kpi.title}: ${kpi.value} (${kpi.change} vs ${previousYear})`
+          ),
           "",
-          "🧬 SOROTIPOS CIRCULANTES:",
-          "• DENV-2: 67% dos casos (predominante)",
-          "• DENV-1: 28% dos casos",
-          "• DENV-3: 4% dos casos",  
-          "• DENV-4: 1% dos casos",
+          `📈 ANÁLISE COMPARATIVA ${previousYear}-${currentYear}:`,
+          `• Tendência geral: ${panel.kpis.filter(k => k.changeType === 'increase').length > panel.kpis.filter(k => k.changeType === 'decrease').length ? 'Melhoria' : 'Estável'}`,
+          `• Indicadores em alta: ${panel.kpis.filter(k => k.changeType === 'increase').length}`,
+          `• Indicadores em queda: ${panel.kpis.filter(k => k.changeType === 'decrease').length}`,
           "",
-          "☠️ LETALIDADE:",
-          "• Dengue: 5.967 óbitos confirmados",
-          "• Taxa de letalidade: 0.1%",
-          "• Grupos de risco: >60 anos, gestantes, imunossuprimidos",
+          "🎯 DESTAQUES DO PERÍODO:",
+          ...panel.kpis.slice(0, 3).map(kpi => 
+            `• ${kpi.description}`
+          ),
           "",
-          "📊 OUTRAS DOENÇAS DE NOTIFICAÇÃO:",
-          "• COVID-19: tendência decrescente",
-          "• Influenza: sazonalidade normal",
-          "• Febre amarela: sem casos urbanos"
+          "🔍 ANÁLISE CRÍTICA:",
+          `• O setor de ${panel.title.toLowerCase()} apresenta ${panel.kpis.filter(k => k.changeType === 'increase').length > 2 ? 'evolução positiva' : 'desafios significativos'}`,
+          `• Necessário monitoramento contínuo dos indicadores críticos`,
+          `• Recomenda-se investimento em áreas com performance inferior`,
+          "",
+          "📊 DADOS DOS GRÁFICOS:",
+          ...panel.charts.map(chart => 
+            `• ${chart.title}: ${chart.data.length} categorias analisadas`
+          ),
+          "",
+          "🎯 RECOMENDAÇÕES ESTRATÉGICAS:",
+          `• Fortalecer monitoramento dos indicadores de ${panel.title.toLowerCase()}`,
+          `• Implementar melhorias nos processos com performance inferior`,
+          `• Manter investimentos nas áreas com bom desempenho`,
+          `• Estabelecer metas claras para o próximo período`
         ],
         timestamp
       };
@@ -137,8 +147,8 @@ export const Reports = () => {
     return null;
   };
 
-  const handleGenerateReport = (templateTitle: string) => {
-    const data = generateReportData(templateTitle);
+  const handleGenerateReport = (templateTitle: string, panelId?: string) => {
+    const data = generateReportData(templateTitle, panelId);
     if (data) {
       setReportData(data);
       setShowReport(true);
@@ -160,7 +170,7 @@ export const Reports = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {reportTemplates.map((template, index) => {
             const Icon = template.icon;
             return (
@@ -193,7 +203,7 @@ export const Reports = () => {
                   <Button 
                     variant="outline" 
                     className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors"
-                    onClick={() => handleGenerateReport(template.title)}
+                    onClick={() => handleGenerateReport(template.title, template.panelId)}
                   >
                     <Download className="h-4 w-4 mr-2" />
                     Gerar Relatório
