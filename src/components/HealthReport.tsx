@@ -513,13 +513,13 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
         description: "Processando o relatório..."
       });
 
-      // Configurações otimizadas para PDF com texto nítido e de alta qualidade
+      // Configurações otimizadas para PDF com largura máxima e texto nítido
       const canvas = await html2canvas(reportElement, {
-        scale: 5, // Aumentado para 5 para máxima qualidade de texto
+        scale: 3, // Reduzido para 3 para melhor proporção
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
-        width: reportElement.scrollWidth,
+        width: 800, // Largura fixa para garantir consistência
         height: reportElement.scrollHeight,
         logging: false,
         imageTimeout: 0,
@@ -531,17 +531,15 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
       
-      // Configurações otimizadas para PDF com margens mínimas
-      const margin = 2; // Margem mínima de 2mm para máximo aproveitamento da página
+      // Configurações para usar toda a largura do PDF
+      const margin = 5; // Margem mínima
       const availableWidth = pdfWidth - (margin * 2);
       const availableHeight = pdfHeight - (margin * 2);
       
-      const ratio = Math.min(availableWidth / imgWidth, availableHeight / imgHeight);
-      const scaledWidth = imgWidth * ratio;
-      const scaledHeight = imgHeight * ratio;
+      // Força o uso de toda a largura disponível
+      const scaledWidth = availableWidth;
+      const scaledHeight = (canvas.height / canvas.width) * availableWidth;
       
       const imgX = margin;
       const imgY = margin;
@@ -558,16 +556,16 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
         }
         
         const heightToAdd = Math.min(pageHeight, remainingHeight);
-        const sourceY = currentY * (imgHeight / scaledHeight);
-        const sourceHeight = heightToAdd * (imgHeight / scaledHeight);
+        const sourceY = currentY * (canvas.height / scaledHeight);
+        const sourceHeight = heightToAdd * (canvas.height / scaledHeight);
         
         // Criar canvas temporário para esta seção
         const tempCanvas = document.createElement('canvas');
         const tempCtx = tempCanvas.getContext('2d');
-        tempCanvas.width = imgWidth;
+        tempCanvas.width = canvas.width;
         tempCanvas.height = sourceHeight;
         
-        tempCtx?.drawImage(canvas, 0, sourceY, imgWidth, sourceHeight, 0, 0, imgWidth, sourceHeight);
+        tempCtx?.drawImage(canvas, 0, sourceY, canvas.width, sourceHeight, 0, 0, canvas.width, sourceHeight);
         const tempImgData = tempCanvas.toDataURL('image/png');
         
         pdf.addImage(tempImgData, 'PNG', imgX, imgY, scaledWidth, heightToAdd);
@@ -613,10 +611,10 @@ O sucesso depende fundamentalmente de coordenação interfederativa, investiment
             fontSize: '28px', // Aumentado ainda mais para ocupar melhor a página
             lineHeight: '1.8',
             fontFamily: 'Arial, sans-serif',
-            maxWidth: '100%', // Usar toda a largura disponível
-            width: '100%',
-            margin: '0',
-            padding: '20px',
+            maxWidth: '800px', // Largura fixa para melhor renderização no PDF
+            width: '800px',
+            margin: '0 auto',
+            padding: '30px',
             color: '#000000',
             fontWeight: '500'
           }}>
