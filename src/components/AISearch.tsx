@@ -19,8 +19,8 @@ export const AISearch = () => {
     const lowercaseQuery = query.toLowerCase();
     
     // Verifica se a consulta menciona ambos os indicadores
-    const hasMortalidadeMaterna = lowercaseQuery.includes('morte materna') || lowercaseQuery.includes('mortalidade materna');
-    const hasMortalidadeInfantil = lowercaseQuery.includes('mortalidade infantil') || lowercaseQuery.includes('morte infantil');
+    const hasMortalidadeMaterna = lowercaseQuery.includes('morte materna') || lowercaseQuery.includes('mortalidade materna') || lowercaseQuery.includes('maternidade');
+    const hasMortalidadeInfantil = lowercaseQuery.includes('mortalidade infantil') || lowercaseQuery.includes('morte infantil') || lowercaseQuery.includes('coeficiente de mortalidade infantil');
     
     if (hasMortalidadeMaterna && hasMortalidadeInfantil) {
       return [
