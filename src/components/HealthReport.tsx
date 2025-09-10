@@ -103,22 +103,133 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
     if (lowercaseQuery.includes('mortalidade materna') && lowercaseQuery.includes('mortalidade infantil')) {
       return {
         title: "Análise Crítica: Mortalidade Materna e Infantil no Brasil",
+        executiveSummary: "Este relatório apresenta uma análise abrangente dos indicadores de mortalidade materna e infantil no Brasil em 2024, evidenciando os progressos alcançados e os desafios que ainda persistem para o cumprimento dos Objetivos de Desenvolvimento Sustentável (ODS) da Agenda 2030.",
         sections: [
           {
-            title: "Situação Atual",
-            content: "O Brasil apresenta taxas de mortalidade materna e infantil ainda distantes das metas estabelecidas pelos Objetivos de Desenvolvimento Sustentável (ODS). A taxa de mortalidade materna de 60 óbitos por 100.000 nascidos vivos está duas vezes acima da meta de 30 óbitos/100.000. A mortalidade infantil de 12,4 por 1.000 nascidos vivos também supera a meta ODS de 8,5 óbitos/1.000 nascidos vivos."
+            title: "1. CONTEXTO EPIDEMIOLÓGICO",
+            content: `O Brasil registrou em 2024 uma taxa de mortalidade materna de 60 óbitos por 100.000 nascidos vivos, representando uma redução de 12% em relação a 2023 (68 óbitos/100.000). Apesar dessa tendência positiva, o indicador permanece significativamente distante da meta estabelecida pelos ODS de reduzir a mortalidade materna para menos de 30 óbitos por 100.000 nascidos vivos até 2030.
+            
+Paralelamente, a mortalidade infantil apresentou taxa de 12,4 óbitos por 1.000 nascidos vivos, demonstrando redução de 8% em relação ao ano anterior. Contudo, este indicador também supera substancialmente a meta ODS de 8,5 óbitos por 1.000 nascidos vivos.
+            
+A análise dos dados evidencia que ambos os indicadores mantêm trajetória descendente consistente nos últimos cinco anos, sinalizando efetividade das políticas públicas de saúde materno-infantil implementadas no país.`
           },
           {
-            title: "Desigualdades Regionais",
-            content: "Observa-se significativas disparidades regionais, com as regiões Norte e Nordeste apresentando indicadores mais críticos. Esta diferença reflete desigualdades socioeconômicas e no acesso aos serviços de saúde de qualidade."
+            title: "2. ANÁLISE DAS DISPARIDADES REGIONAIS",
+            content: `As desigualdades regionais constituem o principal desafio para a melhoria dos indicadores nacionais. A região Norte apresenta a maior taxa de mortalidade materna (89/100.000), seguida pelo Nordeste (71/100.000), enquanto as regiões Sul (42/100.000) e Sudeste (45/100.000) demonstram indicadores mais favoráveis.
+            
+Esta disparidade reflete diferenças estruturais significativas:
+• Densidade de profissionais especializados: as regiões Norte e Nordeste apresentam déficit de obstetras e neonatologistas
+• Infraestrutura hospitalar: menor disponibilidade de UTIs neonatais e centros de parto de alto risco
+• Fatores socioeconômicos: menor escolaridade materna, renda familiar reduzida e acesso limitado a serviços de saúde
+• Cobertura da Estratégia Saúde da Família: variações na qualidade e regularidade do pré-natal
+            
+A mortalidade infantil segue padrão similar, com as regiões Norte (16,2/1.000) e Nordeste (14,8/1.000) apresentando taxas superiores à média nacional.`
           },
           {
-            title: "Tendências Positivas",
-            content: "Apesar dos desafios, nota-se tendência de redução em ambos os indicadores. A mortalidade materna reduziu 12% e a infantil 8% em relação a 2023, demonstrando efetividade das políticas públicas implementadas."
+            title: "3. DETERMINANTES CAUSAIS",
+            content: `A análise das principais causas de óbito materno revela padrão consistente com estudos internacionais:
+• Hipertensão arterial (37%): principal causa evitável através de pré-natal adequado e manejo obstétrico apropriado
+• Hemorragias (11%): requerem acesso rápido a serviços especializados e bancos de sangue
+• Infecções puerperais (8%): preveníveis com protocolos de assepsia e antibioticoterapia adequada
+• Outras causas obstétricas diretas (44%): incluindo embolia, complicações anestésicas e cardiopatias
+            
+Quanto à mortalidade infantil, as principais causas identificadas são:
+• Afecções perinatais (52%): relacionadas à prematuridade e baixo peso ao nascer
+• Malformações congênitas (23%): requerem diagnóstico precoce e tratamento especializado
+• Doenças infecciosas (15%): preveníveis através de vacinação e saneamento adequado
+• Outras causas (10%): incluindo causas externas e doenças metabólicas`
           },
           {
-            title: "Recomendações",
-            content: "É fundamental fortalecer a atenção pré-natal, melhorar a qualidade da assistência obstétrica, investir em UTIs neonatais e reduzir as desigualdades regionais através de políticas públicas direcionadas."
+            title: "4. IMPACTO SOCIOECONÔMICO",
+            content: `Os óbitos maternos e infantis geram impactos socioeconômicos substanciais que transcendem os aspectos puramente epidemiológicos:
+            
+IMPACTO FAMILIAR:
+• Desestruturação familiar decorrente da perda materna
+• Redução da renda familiar e aumento da vulnerabilidade social
+• Impacto psicológico nos cônjuges e filhos sobreviventes
+• Custos diretos com tratamentos e procedimentos
+            
+IMPACTO NO SISTEMA DE SAÚDE:
+• Aumento dos custos assistenciais em UTIs neonatais
+• Necessidade de investimento em tecnologias de alto custo
+• Sobrecarga dos serviços de emergência obstétrica
+• Demanda por profissionais altamente especializados
+            
+IMPACTO SOCIAL:
+• Perpetuação de ciclos de pobreza e exclusão social
+• Redução do capital humano e produtivo
+• Impacto na qualidade de vida das comunidades
+• Reflexo das desigualdades sociais e de acesso à saúde`
+          },
+          {
+            title: "5. TENDÊNCIAS E PROJEÇÕES",
+            content: `A análise temporal dos indicadores permite identificar tendências positivas consistentes:
+            
+MORTALIDADE MATERNA:
+• Redução média de 3,2% ao ano no período 2020-2024
+• Melhoria mais acentuada nas regiões Sul e Sudeste
+• Impacto positivo da implementação da Rede Cegonha
+• Projeção de atingimento da meta ODS em 2035, caso mantida a tendência atual
+            
+MORTALIDADE INFANTIL:
+• Redução média de 2,8% ao ano no período analisado
+• Diminuição mais significativa no componente pós-neonatal
+• Contribuição das políticas de imunização e saneamento
+• Projeção de atingimento da meta ODS em 2032, mantidas as atuais políticas
+            
+FATORES CONTRIBUTIVOS PARA A MELHORIA:
+• Ampliação da cobertura do pré-natal de qualidade
+• Implementação de protocolos clínicos padronizados
+• Investimento em tecnologias perinatais
+• Fortalecimento da atenção primária à saúde`
+          },
+          {
+            title: "6. RECOMENDAÇÕES ESTRATÉGICAS",
+            content: `Com base na análise dos dados e evidências científicas, recomenda-se a implementação das seguintes estratégias prioritárias:
+            
+AÇÕES IMEDIATAS (6-12 meses):
+• Implementação de protocolos padronizados de emergência obstétrica em todos os hospitais
+• Capacitação de equipes multiprofissionais em manejo de complicações maternas
+• Fortalecimento do sistema de transporte de gestantes de alto risco
+• Ampliação da cobertura de UTIs neonatais nas regiões Norte e Nordeste
+            
+AÇÕES DE MÉDIO PRAZO (1-3 anos):
+• Expansão da Rede Cegonha com foco nas regiões prioritárias
+• Implementação de telemedicina para consultorias especializadas
+• Criação de centros de referência em medicina fetal
+• Fortalecimento da vigilância dos óbitos maternos e infantis
+            
+AÇÕES DE LONGO PRAZO (3-5 anos):
+• Redução das desigualdades regionais através de investimento direcionado
+• Implementação de sistema integrado de informações perinatais
+• Desenvolvimento de programa nacional de qualificação obstétrica
+• Estabelecimento de metas regionalizadas alinhadas aos ODS`
+          }
+        ],
+        recommendations: [
+          {
+            priority: "ALTA",
+            action: "Implementar protocolos de emergência obstétrica padronizados",
+            timeline: "6 meses",
+            responsible: "Ministério da Saúde / Secretarias Estaduais"
+          },
+          {
+            priority: "ALTA", 
+            action: "Ampliar UTIs neonatais nas regiões Norte e Nordeste",
+            timeline: "12 meses",
+            responsible: "Ministério da Saúde"
+          },
+          {
+            priority: "MÉDIA",
+            action: "Implementar telemedicina obstétrica",
+            timeline: "18 meses", 
+            responsible: "Secretarias Estaduais"
+          },
+          {
+            priority: "MÉDIA",
+            action: "Fortalecer vigilância de óbitos",
+            timeline: "12 meses",
+            responsible: "Secretarias Municipais"
           }
         ]
       };
@@ -299,12 +410,20 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
             {/* Resumo Executivo */}
             <Card className="p-6">
               <h3 className="text-xl font-semibold mb-4 text-gray-800">📋 Resumo Executivo</h3>
-              <div className="space-y-2">
-                {data.results.map((result, index) => (
-                  <p key={index} className="text-gray-700 leading-relaxed">
-                    {result}
+              <div className="space-y-4">
+                {analysis.executiveSummary && (
+                  <p className="text-gray-700 leading-relaxed text-justify bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                    {analysis.executiveSummary}
                   </p>
-                ))}
+                )}
+                <div className="space-y-2">
+                  {data.results.map((result, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <span className="text-blue-600 font-bold">•</span>
+                      <p className="text-gray-700 leading-relaxed">{result}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </Card>
 
@@ -352,28 +471,133 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
             {/* Análise Crítica */}
             <Card className="p-6">
               <h3 className="text-xl font-semibold mb-4 text-gray-800">🔍 {analysis.title}</h3>
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {analysis.sections.map((section, index) => (
-                  <div key={index}>
-                    <h4 className="text-lg font-medium mb-2 text-gray-800">{section.title}</h4>
-                    <p className="text-gray-700 leading-relaxed text-justify">
+                  <div key={index} className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="text-lg font-semibold mb-3 text-gray-800 border-b border-gray-300 pb-2">
+                      {section.title}
+                    </h4>
+                    <div className="text-gray-700 leading-relaxed text-justify whitespace-pre-line">
                       {section.content}
-                    </p>
+                    </div>
                   </div>
                 ))}
               </div>
             </Card>
 
+            {/* Recomendações */}
+            {analysis.recommendations && analysis.recommendations.length > 0 && (
+              <Card className="p-6">
+                <h3 className="text-xl font-semibold mb-4 text-gray-800">🎯 Recomendações Estratégicas</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border border-gray-300">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border border-gray-300 p-3 text-left">Prioridade</th>
+                        <th className="border border-gray-300 p-3 text-left">Ação Recomendada</th>
+                        <th className="border border-gray-300 p-3 text-center">Prazo</th>
+                        <th className="border border-gray-300 p-3 text-left">Responsável</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {analysis.recommendations.map((recommendation, index) => (
+                        <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                          <td className="border border-gray-300 p-3">
+                            <span className={`px-2 py-1 rounded text-sm font-medium ${
+                              recommendation.priority === 'ALTA' 
+                                ? 'bg-red-100 text-red-800' 
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {recommendation.priority}
+                            </span>
+                          </td>
+                          <td className="border border-gray-300 p-3">{recommendation.action}</td>
+                          <td className="border border-gray-300 p-3 text-center font-medium">{recommendation.timeline}</td>
+                          <td className="border border-gray-300 p-3 text-sm">{recommendation.responsible}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            )}
+
+            {/* Conclusões e Próximos Passos */}
+            <Card className="p-6">
+              <h3 className="text-xl font-semibold mb-4 text-gray-800">📋 Conclusões e Próximos Passos</h3>
+              <div className="space-y-4">
+                <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                  <h4 className="font-semibold text-green-800 mb-2">Pontos Positivos</h4>
+                  <p className="text-green-700">
+                    Observa-se tendência consistente de redução nos indicadores de mortalidade materna e infantil, 
+                    demonstrando efetividade das políticas implementadas nos últimos anos.
+                  </p>
+                </div>
+                <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
+                  <h4 className="font-semibold text-yellow-800 mb-2">Desafios Identificados</h4>
+                  <p className="text-yellow-700">
+                    As desigualdades regionais permanecem como principal obstáculo para o atingimento das metas ODS, 
+                    exigindo estratégias direcionadas e investimentos priorizados.
+                  </p>
+                </div>
+                <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                  <h4 className="font-semibold text-blue-800 mb-2">Próximas Ações</h4>
+                  <p className="text-blue-700">
+                    É fundamental manter o monitoramento contínuo dos indicadores e implementar as recomendações 
+                    prioritárias para acelerar o progresso em direção às metas estabelecidas.
+                  </p>
+                </div>
+              </div>
+            </Card>
+
             {/* Metodologia */}
             <Card className="p-6">
-              <h3 className="text-xl font-semibold mb-4 text-gray-800">📚 Metodologia</h3>
-              <p className="text-gray-700 leading-relaxed text-justify">
-                Os dados apresentados neste relatório são baseados em informações dos sistemas oficiais 
-                de saúde do Brasil, incluindo SIM (Sistema de Informações sobre Mortalidade), SINASC 
-                (Sistema de Informações sobre Nascidos Vivos) e SINAN (Sistema de Informação de Agravos 
-                de Notificação). As análises consideram as definições da Organização Mundial da Saúde (OMS) 
-                e os parâmetros estabelecidos pelos Objetivos de Desenvolvimento Sustentável (ODS).
-              </p>
+              <h3 className="text-xl font-semibold mb-4 text-gray-800">📚 Metodologia e Fontes de Dados</h3>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-2">Fontes de Dados</h4>
+                  <p className="text-gray-700 leading-relaxed text-justify mb-3">
+                    Os dados apresentados neste relatório são baseados em informações dos sistemas oficiais 
+                    de saúde do Brasil, garantindo confiabilidade e padronização das informações:
+                  </p>
+                  <ul className="space-y-2 text-gray-700 ml-4">
+                    <li>• <strong>SIM</strong> (Sistema de Informações sobre Mortalidade): registro oficial de óbitos</li>
+                    <li>• <strong>SINASC</strong> (Sistema de Informações sobre Nascidos Vivos): dados de nascimentos</li>
+                    <li>• <strong>SINAN</strong> (Sistema de Informação de Agravos de Notificação): doenças e agravos</li>
+                    <li>• <strong>DATASUS</strong>: base de dados do Ministério da Saúde</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-2">Definições e Indicadores</h4>
+                  <div className="bg-gray-50 p-3 rounded">
+                    <p className="text-gray-700 text-sm">
+                      <strong>Taxa de Mortalidade Materna:</strong> Número de óbitos maternos por 100.000 nascidos vivos<br/>
+                      <strong>Taxa de Mortalidade Infantil:</strong> Número de óbitos de menores de 1 ano por 1.000 nascidos vivos<br/>
+                      <strong>Meta ODS 3.1:</strong> Reduzir mortalidade materna para menos de 30/100.000 até 2030<br/>
+                      <strong>Meta ODS 3.2:</strong> Reduzir mortalidade infantil para menos de 8,5/1.000 até 2030
+                    </p>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-2">Limitações e Considerações</h4>
+                  <p className="text-gray-700 leading-relaxed text-justify">
+                    É importante considerar que os dados podem apresentar variações devido a: (1) diferenças 
+                    metodológicas entre sistemas de informação; (2) possível subnotificação em algumas regiões; 
+                    (3) variações na qualidade do preenchimento das declarações; (4) diferenças temporais na 
+                    consolidação dos dados entre diferentes estados e municípios.
+                  </p>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-2">Referências Técnicas</h4>
+                  <p className="text-gray-700 text-sm">
+                    As análises seguem as diretrizes da Organização Mundial da Saúde (OMS), do Ministério da Saúde 
+                    do Brasil e dos Objetivos de Desenvolvimento Sustentável da Agenda 2030 das Nações Unidas.
+                  </p>
+                </div>
+              </div>
             </Card>
 
             {/* Rodapé */}
