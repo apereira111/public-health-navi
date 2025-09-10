@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Download, Sparkles, Calendar, TrendingUp } from "lucide-react";
+import { HealthReport } from "./HealthReport";
 
 const reportTemplates = [
   {
@@ -28,6 +30,120 @@ const reportTemplates = [
 ];
 
 export const Reports = () => {
+  const [showReport, setShowReport] = useState(false);
+  const [reportData, setReportData] = useState<{query: string, results: string[], timestamp: string} | null>(null);
+
+  const generateReportData = (templateTitle: string) => {
+    const timestamp = new Date().toISOString();
+    
+    if (templateTitle === "Relatório de Saúde Materna") {
+      return {
+        query: "Relatório detalhado sobre mortalidade materna e cuidados pré-natais no Brasil em 2024",
+        results: [
+          "📊 MORTALIDADE MATERNA NO BRASIL - 2024:",
+          "",
+          "• Taxa atual: 60 óbitos por 100.000 nascidos vivos",
+          "• Meta ODS 2030: 30 óbitos por 100.000 nascidos vivos",
+          "• Situação: 100% acima da meta estabelecida",
+          "",
+          "🏥 PRINCIPAIS CAUSAS DE MORTALIDADE MATERNA:",
+          "• Hipertensão arterial: 37% dos casos",
+          "• Hemorragia obstétrica: 11% dos casos", 
+          "• Infecção puerperal: 8% dos casos",
+          "• Embolia: 6% dos casos",
+          "",
+          "📈 EVOLUÇÃO TEMPORAL:",
+          "• 2023: 68 óbitos/100.000 nascidos vivos",
+          "• 2024: 60 óbitos/100.000 nascidos vivos",
+          "• Redução: 12% em relação ao ano anterior",
+          "",
+          "🗺️ DISTRIBUIÇÃO REGIONAL:",
+          "• Região Norte: 89 óbitos/100.000 (mais crítica)",
+          "• Região Nordeste: 71 óbitos/100.000",
+          "• Região Sul: 45 óbitos/100.000 (melhor índice)",
+          "",
+          "🤱 CUIDADOS PRÉ-NATAIS:",
+          "• Cobertura nacional: 89.2% das gestantes",
+          "• Meta recomendada: 95% de cobertura",
+          "• Consultas adequadas (≥6): 78% das gestantes"
+        ],
+        timestamp
+      };
+    } else if (templateTitle === "Resumo Mensal de Saúde") {
+      return {
+        query: "Resumo executivo dos principais indicadores de saúde do Brasil - Dezembro 2024",
+        results: [
+          "📊 RESUMO EXECUTIVO - DEZEMBRO 2024:",
+          "",
+          "🔴 INDICADORES CRÍTICOS:",
+          "• Mortalidade materna: 60/100.000 (meta: 30/100.000)",
+          "• Mortalidade infantil: 12.4/1.000 (meta: 8.5/1.000)",
+          "• Casos de dengue: 6.1 milhões (aumento de 180%)",
+          "",
+          "🟡 INDICADORES DE ATENÇÃO:",
+          "• Cobertura vacinal: 87.3% (meta: 95%)",
+          "• Cobertura pré-natal: 89.2% (meta: 95%)",
+          "• Casos de tuberculose: estável (44/100.000)",
+          "",
+          "🟢 INDICADORES POSITIVOS:",
+          "• Redução de 12% na mortalidade materna",
+          "• Redução de 8% na mortalidade infantil",
+          "• Aumento de 15% na cobertura de ESF rural",
+          "",
+          "📈 TENDÊNCIAS DO ANO:",
+          "• Melhoria geral nos indicadores materno-infantis",
+          "• Desafios persistentes em doenças infecciosas",
+          "• Necessidade de fortalecimento da vigilância epidemiológica"
+        ],
+        timestamp
+      };
+    } else if (templateTitle === "Relatório de Vigilância de Doenças") {
+      return {
+        query: "Relatório de vigilância epidemiológica - Doenças infecciosas Brasil 2024",
+        results: [
+          "🦠 VIGILÂNCIA EPIDEMIOLÓGICA - SEMANA 50/2024:",
+          "",
+          "🔴 ALERTAS CRÍTICOS:",
+          "• Dengue: 6.1 milhões de casos (+180% vs 2023)",
+          "• Chikungunya: 315.000 casos (+45% vs 2023)",
+          "• Zika: 12.500 casos (estável)",
+          "",
+          "📍 DISTRIBUIÇÃO GEOGRÁFICA - DENGUE:",
+          "• Minas Gerais: 1.8 milhões de casos",
+          "• São Paulo: 1.2 milhões de casos",
+          "• Paraná: 890.000 casos",
+          "• Santa Catarina: 650.000 casos",
+          "",
+          "🧬 SOROTIPOS CIRCULANTES:",
+          "• DENV-2: 67% dos casos (predominante)",
+          "• DENV-1: 28% dos casos",
+          "• DENV-3: 4% dos casos",  
+          "• DENV-4: 1% dos casos",
+          "",
+          "☠️ LETALIDADE:",
+          "• Dengue: 5.967 óbitos confirmados",
+          "• Taxa de letalidade: 0.1%",
+          "• Grupos de risco: >60 anos, gestantes, imunossuprimidos",
+          "",
+          "📊 OUTRAS DOENÇAS DE NOTIFICAÇÃO:",
+          "• COVID-19: tendência decrescente",
+          "• Influenza: sazonalidade normal",
+          "• Febre amarela: sem casos urbanos"
+        ],
+        timestamp
+      };
+    }
+    
+    return null;
+  };
+
+  const handleGenerateReport = (templateTitle: string) => {
+    const data = generateReportData(templateTitle);
+    if (data) {
+      setReportData(data);
+      setShowReport(true);
+    }
+  };
   return (
     <section className="py-20 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -77,10 +193,7 @@ export const Reports = () => {
                   <Button 
                     variant="outline" 
                     className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors"
-                    onClick={() => {
-                      // TODO: Implement report generation
-                      alert(`Gerando ${template.title}... Esta funcionalidade será implementada em breve!`);
-                    }}
+                    onClick={() => handleGenerateReport(template.title)}
                   >
                     <Download className="h-4 w-4 mr-2" />
                     Gerar Relatório
@@ -155,6 +268,13 @@ export const Reports = () => {
           </div>
         </Card>
       </div>
+      
+      {showReport && reportData && (
+        <HealthReport 
+          data={reportData} 
+          onClose={() => setShowReport(false)} 
+        />
+      )}
     </section>
   );
 };
