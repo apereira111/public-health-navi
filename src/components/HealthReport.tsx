@@ -360,13 +360,77 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
 **Consultas de Puericultura:** Acompanhamento do crescimento e desenvolvimento infantil
 **Meta ODS 3.2:** Reduzir mortalidade infantil para menos de 8,5/1.000 até 2030`
         };
+      case 'womens-health':
+        return {
+          title: 'Definições e Indicadores - Saúde da Mulher',
+          content: `**Taxa de Mortalidade Materna:** Número de óbitos maternos por 100.000 nascidos vivos
+**Cobertura Pré-natal:** Percentual de gestantes com 7 ou mais consultas pré-natais
+**Parto Cesáreo:** Proporção de partos cesáreos em relação ao total de partos
+**Rastreamento do Câncer de Colo:** Cobertura de exames preventivos em mulheres de 25-64 anos
+**Meta ODS 3.1:** Reduzir mortalidade materna para menos de 30/100.000 até 2030`
+        };
+      case 'epidemiology':
+        return {
+          title: 'Definições e Indicadores - Vigilância Epidemiológica',
+          content: `**Incidência:** Número de casos novos por 100.000 habitantes em período determinado
+**Letalidade:** Proporção de óbitos entre os casos confirmados da doença
+**Taxa de Notificação:** Número de notificações por 100.000 habitantes
+**Cobertura Vacinal:** Percentual da população-alvo vacinada conforme esquema recomendado
+**Surto:** Ocorrência epidêmica restrita a espaço delimitado`
+        };
+      case 'chronic-diseases':
+        return {
+          title: 'Definições e Indicadores - Doenças Crônicas',
+          content: `**Prevalência de Diabetes:** Percentual da população com diagnóstico de diabetes mellitus
+**Prevalência de Hipertensão:** Percentual da população com diagnóstico de hipertensão arterial
+**Controle Glicêmico:** Proporção de diabéticos com HbA1c <7%
+**Controle Pressórico:** Proporção de hipertensos com pressão arterial controlada
+**Internações por DCNT:** Taxa de internações por doenças crônicas não transmissíveis`
+        };
+      case 'elderly-health':
+        return {
+          title: 'Definições e Indicadores - Saúde do Idoso',
+          content: `**Cobertura de Caderneta do Idoso:** Percentual de idosos acompanhados na APS
+**Taxa de Quedas:** Incidência de quedas por 1.000 idosos/ano
+**Vacinação Influenza:** Cobertura vacinal contra influenza em idosos ≥60 anos
+**Avaliação Multidimensional:** Proporção de idosos com avaliação geriátrica ampla
+**Fragilidade:** Prevalência de síndrome de fragilidade em idosos`
+        };
+      case 'mental-health':
+        return {
+          title: 'Definições e Indicadores - Saúde Mental',
+          content: `**Taxa de Suicídio:** Número de óbitos por suicídio por 100.000 habitantes
+**CAPS:** Centros de Atenção Psicossocial - serviços especializados em saúde mental
+**Cobertura CAPS:** Número de CAPS por 100.000 habitantes
+**Internações Psiquiátricas:** Taxa de internações em hospitais psiquiátricos
+**Acompanhamento Territorial:** Proporção de usuários em seguimento na rede territorial`
+        };
+      case 'primary-care':
+        return {
+          title: 'Definições e Indicadores - Atenção Primária',
+          content: `**Cobertura ESF:** Percentual da população coberta por equipes de Saúde da Família
+**Consultas per capita:** Número médio de consultas médicas por habitante/ano
+**PMAQ:** Programa de Melhoria do Acesso e da Qualidade da Atenção Básica
+**eMulti:** Equipes multiprofissionais de Atenção Básica
+**Teleconsultoria:** Consultas realizadas através de telemedicina`
+        };
+      case 'financing':
+        return {
+          title: 'Definições e Indicadores - Financiamento da APS',
+          content: `**Gasto per capita APS:** Gasto em Atenção Primária por habitante/ano
+**PAB Fixo:** Piso de Atenção Básica - repasse federal fixo por habitante
+**PAB Variável:** Recursos federais condicionados a programas específicos
+**Aplicação Mínima:** Percentual mínimo de recursos próprios aplicados em saúde
+**Investimento em APS:** Proporção do orçamento de saúde aplicada na Atenção Primária`
+        };
       default:
         return {
-          title: 'Definições e Indicadores',
-          content: `**Taxa de Mortalidade Materna:** Número de óbitos maternos por 100.000 nascidos vivos
-**Taxa de Mortalidade Infantil:** Número de óbitos de menores de 1 ano por 1.000 nascidos vivos
-**Meta ODS 3.1:** Reduzir mortalidade materna para menos de 30/100.000 até 2030
-**Meta ODS 3.2:** Reduzir mortalidade infantil para menos de 8,5/1.000 até 2030`
+          title: 'Definições e Indicadores Gerais',
+          content: `**Indicadores de Saúde:** Medidas quantitativas do estado de saúde da população
+**Sistemas de Informação:** Ferramentas de coleta, processamento e análise de dados de saúde
+**Pactuação:** Processo de negociação e acordo de metas entre gestores do SUS
+**Monitoramento:** Acompanhamento sistemático do cumprimento de metas e indicadores
+**Avaliação:** Análise crítica dos resultados alcançados e impactos das ações de saúde`
         };
     }
   };
@@ -388,9 +452,51 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
           challenges: "A necessidade de ampliar a cobertura vacinal e melhorar a qualidade do acompanhamento de puericultura, especialmente em regiões com menores indicadores socioeconômicos, permanece como desafio prioritário.",
           nextSteps: "É essencial fortalecer as ações de vigilância nutricional, ampliar a cobertura de consultas de puericultura e implementar estratégias de busca ativa para crianças em situação de vulnerabilidade."
         };
+      case 'womens-health':
+        return {
+          positive: "Os indicadores de saúde da mulher demonstram avanços importantes na redução da mortalidade materna e ampliação do acesso ao pré-natal de qualidade, refletindo o fortalecimento das redes de atenção materno-infantil.",
+          challenges: "A persistência de altas taxas de cesariana e disparidades regionais no acesso aos serviços de saúde reprodutiva constituem desafios que requerem estratégias integradas e multissetoriais.",
+          nextSteps: "Priorizar a qualificação do pré-natal, fortalecer a atenção ao parto normal e ampliar o acesso ao planejamento reprodutivo, especialmente nas regiões com maiores vulnerabilidades."
+        };
+      case 'epidemiology':
+        return {
+          positive: "O sistema de vigilância epidemiológica tem demonstrado capacidade de resposta adequada aos eventos de saúde pública, com melhoria na oportunidade das notificações e fortalecimento das ações de controle.",
+          challenges: "A necessidade de fortalecer a vigilância em municípios de pequeno porte e aprimorar a integração entre os sistemas de informação permanece como desafio para o aprimoramento contínuo.",
+          nextSteps: "Intensificar as ações de capacitação das equipes de vigilância, modernizar os sistemas de informação e fortalecer as ações de prevenção e controle de doenças transmissíveis."
+        };
+      case 'chronic-diseases':
+        return {
+          positive: "Observa-se melhoria no controle das doenças crônicas não transmissíveis, com ampliação do acesso ao diagnóstico precoce e aumento da adesão ao tratamento na Atenção Primária.",
+          challenges: "A necessidade de reduzir a incidência de complicações das DCNT e melhorar a qualidade de vida dos pacientes crônicos continua sendo um desafio prioritário para o sistema de saúde.",
+          nextSteps: "Fortalecer as ações de promoção da saúde, ampliar o acesso a medicamentos essenciais e implementar programas integrados de cuidado às condições crônicas."
+        };
+      case 'elderly-health':
+        return {
+          positive: "O envelhecimento ativo e saudável tem ganhado protagonismo nas políticas de saúde, com melhoria na cobertura vacinal e ampliação dos serviços especializados para a população idosa.",
+          challenges: "O aumento da demanda por cuidados geriátricos e a necessidade de capacitação das equipes para o atendimento multidimensional do idoso representam desafios crescentes.",
+          nextSteps: "Implementar a avaliação geriátrica ampla na Atenção Primária, fortalecer a rede de cuidados domiciliares e ampliar a prevenção de quedas e fragilidade."
+        };
+      case 'mental-health':
+        return {
+          positive: "A expansão da Rede de Atenção Psicossocial e o fortalecimento dos CAPS têm contribuído para a melhoria do acesso aos cuidados em saúde mental de base comunitária.",
+          challenges: "A persistência de altas taxas de suicídio e a necessidade de integração entre atenção primária e serviços especializados em saúde mental permanecem como desafios prioritários.",
+          nextSteps: "Ampliar a cobertura da RAPS, fortalecer as ações de prevenção ao suicídio e qualificar o cuidado em saúde mental na Atenção Primária através de capacitação e matriciamento."
+        };
+      case 'primary-care':
+        return {
+          positive: "A Estratégia Saúde da Família tem demonstrado impacto positivo nos indicadores de saúde, com expansão da cobertura e melhoria da qualidade da atenção básica em todo o país.",
+          challenges: "A necessidade de fortalecimento da capacidade resolutiva da APS e melhoria da integração com os demais níveis de atenção permanecem como desafios estruturais.",
+          nextSteps: "Ampliar a cobertura da ESF, fortalecer a educação permanente das equipes e implementar novas tecnologias para apoio ao cuidado, incluindo telessaúde."
+        };
+      case 'financing':
+        return {
+          positive: "Os investimentos em Atenção Primária têm apresentado crescimento consistente, com ampliação dos recursos federais e melhoria na aplicação dos recursos pelos municípios.",
+          challenges: "A necessidade de garantir sustentabilidade financeira do SUS e reduzir as disparidades de investimento entre diferentes regiões do país continua sendo um desafio fundamental.",
+          nextSteps: "Fortalecer os mecanismos de financiamento da APS, aprimorar os critérios de alocação de recursos e implementar instrumentos de monitoramento da aplicação dos investimentos."
+        };
       default:
         return {
-          positive: "Observa-se tendência consistente de redução nos indicadores de mortalidade materna e infantil, demonstrando efetividade das políticas implementadas nos últimos anos.",
+          positive: "Os indicadores de saúde demonstram evolução positiva no período analisado, evidenciando o impacto das políticas públicas implementadas e o fortalecimento do Sistema Único de Saúde.",
           challenges: "As desigualdades regionais permanecem como principal obstáculo para o atingimento das metas ODS, exigindo estratégias direcionadas e investimentos priorizados.",
           nextSteps: "É fundamental manter o monitoramento contínuo dos indicadores e implementar as recomendações prioritárias para acelerar o progresso em direção às metas estabelecidas."
         };
@@ -402,34 +508,52 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
       const element = document.getElementById('health-report');
       if (!element) return;
 
+      const canvasScale = 2; // Scale factor for better quality
       const canvas = await html2canvas(element, { 
-        scale: 1,
+        scale: canvasScale,
         useCORS: true,
         allowTaint: false,
         backgroundColor: '#ffffff',
         height: element.scrollHeight,
-        width: element.scrollWidth
+        width: element.scrollWidth,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight
       });
       
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/png', 1.0); // Maximum quality
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
-        format: 'a4'
+        format: 'a4',
+        compress: true
       });
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 0;
+      
+      // Calculate proper scaling to fill the page width with margins
+      const margin = 10; // 10mm margin
+      const availableWidth = pdfWidth - (margin * 2);
+      const availableHeight = pdfHeight - (margin * 2);
+      
+      const widthRatio = availableWidth / (imgWidth / canvasScale);
+      const heightRatio = availableHeight / (imgHeight / canvasScale);
+      const ratio = Math.min(widthRatio, heightRatio);
+      
+      const scaledWidth = (imgWidth / canvasScale) * ratio;
+      const scaledHeight = (imgHeight / canvasScale) * ratio;
+      
+      const imgX = margin + (availableWidth - scaledWidth) / 2;
+      const imgY = margin;
 
       // Se o conteúdo for muito alto, dividir em páginas
-      if (imgHeight * ratio > pdfHeight) {
+      if (scaledHeight > availableHeight) {
         let position = 0;
-        const pageHeight = pdfHeight / ratio;
+        const pageHeight = availableHeight / ratio * canvasScale;
         
         while (position < imgHeight) {
           const pageCanvas = document.createElement('canvas');
@@ -439,16 +563,18 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
           const pageCtx = pageCanvas.getContext('2d');
           if (pageCtx) {
             pageCtx.drawImage(canvas, 0, position, imgWidth, pageCanvas.height, 0, 0, imgWidth, pageCanvas.height);
-            const pageImgData = pageCanvas.toDataURL('image/png');
+            const pageImgData = pageCanvas.toDataURL('image/png', 1.0);
             
             if (position > 0) pdf.addPage();
-            pdf.addImage(pageImgData, 'PNG', imgX, imgY, imgWidth * ratio, pageCanvas.height * ratio);
+            
+            const pageScaledHeight = (pageCanvas.height / canvasScale) * ratio;
+            pdf.addImage(pageImgData, 'PNG', imgX, imgY, scaledWidth, pageScaledHeight);
           }
           
           position += pageHeight;
         }
       } else {
-        pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+        pdf.addImage(imgData, 'PNG', imgX, imgY, scaledWidth, scaledHeight);
       }
       
       pdf.save(`relatorio-saude-${new Date().getTime()}.pdf`);
