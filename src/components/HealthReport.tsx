@@ -25,8 +25,35 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
   const generateChartData = (query: string) => {
     const lowercaseQuery = query.toLowerCase();
     
+    if (lowercaseQuery.includes('mortalidade materna') && lowercaseQuery.includes('mortalidade infantil')) {
+      return [
+        {
+          type: 'bar',
+          title: 'Taxa de Mortalidade Materna por Região (2024)',
+          data: [
+            { name: 'Norte', value: 89, target: 30 },
+            { name: 'Nordeste', value: 71, target: 30 },
+            { name: 'Centro-Oeste', value: 58, target: 30 },
+            { name: 'Sudeste', value: 45, target: 30 },
+            { name: 'Sul', value: 42, target: 30 }
+          ]
+        },
+        {
+          type: 'bar',
+          title: 'Taxa de Mortalidade Infantil por Região (2024)',
+          data: [
+            { name: 'Norte', value: 16.2, target: 8.5 },
+            { name: 'Nordeste', value: 14.8, target: 8.5 },
+            { name: 'Centro-Oeste', value: 12.1, target: 8.5 },
+            { name: 'Sudeste', value: 10.3, target: 8.5 },
+            { name: 'Sul', value: 9.7, target: 8.5 }
+          ]
+        }
+      ];
+    }
+    
     if (lowercaseQuery.includes('mortalidade materna')) {
-      return {
+      return [{
         type: 'bar',
         title: 'Taxa de Mortalidade Materna por Região (2024)',
         data: [
@@ -36,11 +63,11 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
           { name: 'Sudeste', value: 45, target: 30 },
           { name: 'Sul', value: 42, target: 30 }
         ]
-      };
+      }];
     }
     
     if (lowercaseQuery.includes('mortalidade infantil')) {
-      return {
+      return [{
         type: 'line',
         title: 'Evolução da Mortalidade Infantil - Brasil (2020-2024)',
         data: [
@@ -50,11 +77,11 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
           { year: '2023', value: 13.5 },
           { year: '2024', value: 12.4 }
         ]
-      };
+      }];
     }
     
     if (lowercaseQuery.includes('dengue')) {
-      return {
+      return [{
         type: 'pie',
         title: 'Distribuição de Casos de Dengue por Região (2024)',
         data: [
@@ -64,10 +91,10 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
           { name: 'Centro-Oeste', value: 12, cases: 732000 },
           { name: 'Norte', value: 6, cases: 366000 }
         ]
-      };
+      }];
     }
     
-    return null;
+    return [];
   };
 
   const generateAnalysis = (query: string, results: string[]) => {
@@ -79,7 +106,7 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
         sections: [
           {
             title: "Situação Atual",
-            content: "O Brasil apresenta taxas de mortalidade materna e infantil ainda distantes das metas estabelecidas pelos Objetivos de Desenvolvimento Sustentável (ODS). A taxa de mortalidade materna de 60 óbitos por 100.000 nascidos vivos está duas vezes acima da meta de 30 óbitos/100.000."
+            content: "O Brasil apresenta taxas de mortalidade materna e infantil ainda distantes das metas estabelecidas pelos Objetivos de Desenvolvimento Sustentável (ODS). A taxa de mortalidade materna de 60 óbitos por 100.000 nascidos vivos está duas vezes acima da meta de 30 óbitos/100.000. A mortalidade infantil de 12,4 por 1.000 nascidos vivos também supera a meta ODS de 8,5 óbitos/1.000 nascidos vivos."
           },
           {
             title: "Desigualdades Regionais",
@@ -135,14 +162,14 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
   const chartData = generateChartData(data.query);
   const analysis = generateAnalysis(data.query, data.results);
 
-  const renderChart = () => {
-    if (!chartData) return null;
+  const renderChart = (chart: any) => {
+    if (!chart) return null;
 
-    switch (chartData.type) {
+    switch (chart.type) {
       case 'bar':
         return (
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData.data}>
+            <BarChart data={chart.data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
@@ -156,7 +183,7 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
       case 'line':
         return (
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData.data}>
+            <LineChart data={chart.data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="year" />
               <YAxis />
@@ -171,7 +198,7 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={chartData.data}
+                data={chart.data}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
@@ -180,7 +207,7 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
                 fill="#8884d8"
                 dataKey="value"
               >
-                {chartData.data.map((entry, index) => (
+                {chart.data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
@@ -282,43 +309,45 @@ export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => 
             </Card>
 
             {/* Visualização de Dados */}
-            {chartData && (
-              <Card className="p-6">
-                <h3 className="text-xl font-semibold mb-4 text-gray-800">📊 {chartData.title}</h3>
-                {renderChart()}
+            {chartData && chartData.length > 0 && chartData.map((chart, index) => (
+              <Card key={index} className="p-6">
+                <h3 className="text-xl font-semibold mb-4 text-gray-800">📊 {chart.title}</h3>
+                {renderChart(chart)}
               </Card>
-            )}
+            ))}
 
-            {/* Tabela de Dados */}
-            {chartData && chartData.type === 'bar' && (
-              <Card className="p-6">
-                <h3 className="text-xl font-semibold mb-4 text-gray-800">📈 Dados Detalhados</h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse border border-gray-300">
-                    <thead>
-                      <tr className="bg-gray-100">
-                        <th className="border border-gray-300 p-3 text-left">Região</th>
-                        <th className="border border-gray-300 p-3 text-center">Taxa Atual</th>
-                        <th className="border border-gray-300 p-3 text-center">Meta ODS</th>
-                        <th className="border border-gray-300 p-3 text-center">Distância da Meta</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {chartData.data.map((item, index) => (
-                        <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                          <td className="border border-gray-300 p-3 font-medium">{item.name}</td>
-                          <td className="border border-gray-300 p-3 text-center">{item.value}</td>
-                          <td className="border border-gray-300 p-3 text-center">{item.target}</td>
-                          <td className="border border-gray-300 p-3 text-center text-red-600">
-                            +{item.value - item.target}
-                          </td>
+            {/* Tabelas de Dados */}
+            {chartData && chartData.length > 0 && chartData.map((chart, index) => (
+              chart.type === 'bar' && (
+                <Card key={`table-${index}`} className="p-6">
+                  <h3 className="text-xl font-semibold mb-4 text-gray-800">📈 Dados Detalhados - {chart.title}</h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-gray-300">
+                      <thead>
+                        <tr className="bg-gray-100">
+                          <th className="border border-gray-300 p-3 text-left">Região</th>
+                          <th className="border border-gray-300 p-3 text-center">Taxa Atual</th>
+                          <th className="border border-gray-300 p-3 text-center">Meta ODS</th>
+                          <th className="border border-gray-300 p-3 text-center">Distância da Meta</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
-            )}
+                      </thead>
+                      <tbody>
+                        {chart.data.map((item, itemIndex) => (
+                          <tr key={itemIndex} className={itemIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                            <td className="border border-gray-300 p-3 font-medium">{item.name}</td>
+                            <td className="border border-gray-300 p-3 text-center">{item.value}</td>
+                            <td className="border border-gray-300 p-3 text-center">{item.target}</td>
+                            <td className="border border-gray-300 p-3 text-center text-red-600">
+                              +{item.value - item.target}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
+              )
+            ))}
 
             {/* Análise Crítica */}
             <Card className="p-6">
