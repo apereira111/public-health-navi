@@ -17,6 +17,7 @@ const Analytics = () => {
         </div>
         <div className="space-y-12">
           <DataCollector />
+          <AISearch />
         </div>
       </div>
     </div>
