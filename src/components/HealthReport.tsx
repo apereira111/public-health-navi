@@ -489,7 +489,8 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
     // GRÁFICO DE CORRELAÇÃO (SCATTER PLOT)
     if (chart.type === 'correlation_scatter') {
       return (
-        <div>
+        <div className="w-full chart-container">
+          <h4 className="chart-title text-lg font-semibold mb-4">{chart.title}</h4>
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={chart.data} margin={{ top: 20, right: 30, left: 40, bottom: 60 }}>
               <CartesianGrid strokeDasharray="3 3" />
