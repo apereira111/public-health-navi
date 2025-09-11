@@ -160,18 +160,30 @@ function toast({ ...props }: Toast) {
     description: props.description ? sanitizeToastValue(props.description) : undefined,
   };
 
-  const update = (props: ToasterToast) =>
+  const safeAction = props.action && React.isValidElement(props.action) ? props.action : undefined;
+
+  const update = (next: ToasterToast) =>
     dispatch({
       type: "UPDATE_TOAST",
-      toast: { ...props, id },
+      toast: {
+        id,
+        variant: next.variant,
+        title: sanitizeToastValue(next.title),
+        description: sanitizeToastValue(next.description),
+        action: next.action && React.isValidElement(next.action) ? next.action : undefined,
+        open: next.open,
+      },
     });
   const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
 
   dispatch({
     type: "ADD_TOAST",
     toast: {
-      ...sanitizedProps,
       id,
+      variant: (sanitizedProps as any).variant,
+      title: sanitizedProps.title,
+      description: sanitizedProps.description,
+      action: safeAction,
       open: true,
       onOpenChange: (open) => {
         if (!open) dismiss();

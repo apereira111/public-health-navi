@@ -1,5 +1,6 @@
 import { useToast } from "@/hooks/use-toast";
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast";
+import React from "react";
 
 // Sanitiza valores para evitar rendering de objetos
 const normalizeNode = (value: any): string => {
@@ -25,14 +26,19 @@ export function Toaster() {
       {toasts.map(function ({ id, title, description, action, ...props }) {
         const safeTitle = title ? normalizeNode(title) : undefined;
         const safeDescription = description ? normalizeNode(description) : undefined;
-        
+        const safeAction = React.isValidElement(action) ? action : undefined;
+        const allowedProps = {
+          variant: (props as any).variant,
+          open: (props as any).open,
+          onOpenChange: (props as any).onOpenChange,
+        };
         return (
-          <Toast key={id} {...props}>
+          <Toast key={id} {...allowedProps}>
             <div className="grid gap-1">
               {safeTitle && <ToastTitle>{safeTitle}</ToastTitle>}
               {safeDescription && <ToastDescription>{safeDescription}</ToastDescription>}
             </div>
-            {action}
+            {safeAction}
             <ToastClose />
           </Toast>
         );

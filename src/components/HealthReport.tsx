@@ -851,9 +851,7 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
     
     setIsGeneratingPdf(true);
     console.log('HealthReport:generatePDF:start');
-    try {
-      toast({ title: 'Gerando PDF...', description: 'Processando gráficos e conteúdo. Aguarde alguns segundos...' });
-    } catch {}
+    // (removido) Toast de progresso durante geração do PDF para evitar objetos inválidos em UI
 
     // Use requestAnimationFrame to ensure UI updates before heavy processing
     requestAnimationFrame(async () => {
