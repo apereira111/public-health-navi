@@ -2,8 +2,6 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { useToast } from '@/hooks/use-toast';
 
 interface ReportData {
@@ -834,90 +832,67 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
 
   const generatePDF = async () => {
     try {
-      const element = document.getElementById('health-report');
-      if (!element) return;
+      const pdfMakeMod = await import('pdfmake/build/pdfmake');
+      const pdfFontsMod = await import('pdfmake/build/vfs_fonts');
+      const pdfMakeLocal: any = (pdfMakeMod as any).default ?? (pdfMakeMod as any);
+      const vfs = (pdfFontsMod as any).vfs ?? (pdfFontsMod as any).pdfMake?.vfs;
+      if (vfs) pdfMakeLocal.vfs = vfs;
 
-      const canvasScale = 2; // Scale factor for better quality
-      const canvas = await html2canvas(element, { 
-        scale: canvasScale,
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: '#ffffff',
-        height: element.scrollHeight,
-        width: element.scrollWidth,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight
-      });
-      
-      const imgData = canvas.toDataURL('image/png', 1.0); // Maximum quality
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-        compress: true
-      });
-      
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      
-      // Calculate proper scaling to fill the page width with margins
-      const margin = 10; // 10mm margin
-      const availableWidth = pdfWidth - (margin * 2);
-      const availableHeight = pdfHeight - (margin * 2);
-      
-      const widthRatio = availableWidth / (imgWidth / canvasScale);
-      const heightRatio = availableHeight / (imgHeight / canvasScale);
-      const ratio = Math.min(widthRatio, heightRatio);
-      
-      const scaledWidth = (imgWidth / canvasScale) * ratio;
-      const scaledHeight = (imgHeight / canvasScale) * ratio;
-      
-      const imgX = margin + (availableWidth - scaledWidth) / 2;
-      const imgY = margin;
+      const bulletsFromMultiline = (text: string) => text.split('\n').map(s => s.trim()).filter(Boolean);
 
-      // Se o conteúdo for muito alto, dividir em páginas
-      if (scaledHeight > availableHeight) {
-        let position = 0;
-        const pageHeight = availableHeight / ratio * canvasScale;
-        
-        while (position < imgHeight) {
-          const pageCanvas = document.createElement('canvas');
-          pageCanvas.width = imgWidth;
-          pageCanvas.height = Math.min(pageHeight, imgHeight - position);
-          
-          const pageCtx = pageCanvas.getContext('2d');
-          if (pageCtx) {
-            pageCtx.drawImage(canvas, 0, position, imgWidth, pageCanvas.height, 0, 0, imgWidth, pageCanvas.height);
-            const pageImgData = pageCanvas.toDataURL('image/png', 1.0);
-            
-            if (position > 0) pdf.addPage();
-            
-            const pageScaledHeight = (pageCanvas.height / canvasScale) * ratio;
-            pdf.addImage(pageImgData, 'PNG', imgX, imgY, scaledWidth, pageScaledHeight);
-          }
-          
-          position += pageHeight;
-        }
-      } else {
-        pdf.addImage(imgData, 'PNG', imgX, imgY, scaledWidth, scaledHeight);
-      }
-      
-      pdf.save(`relatorio-saude-${new Date().getTime()}.pdf`);
-      toast({
-        title: "PDF Gerado",
-        description: "O relatório foi exportado com sucesso!"
-      });
+      const docDefinition: any = {
+        pageSize: 'A4',
+        pageMargins: [20, 24, 20, 28],
+        content: [
+          { text: 'Relatório de Indicadores de Saúde', style: 'header' },
+          { text: `Consulta: "${data.query}"`, style: 'meta' },
+          { text: `Gerado em: ${new Date(data.timestamp).toLocaleString('pt-BR')}`, style: 'meta', margin: [0, 0, 0, 8] },
+
+          { text: 'Resumo Executivo', style: 'subheader' },
+          ...(analysis.executiveSummary ? [{ text: analysis.executiveSummary, style: 'normal', margin: [0, 0, 0, 10] }] : []),
+          ...(data.results?.length ? [{ ul: data.results, style: 'normal', margin: [0, 0, 0, 12] }] : []),
+
+          { text: 'Seções Analíticas', style: 'subheader' },
+          ...analysis.sections.flatMap((sec) => [
+            { text: sec.title, style: 'sectionTitle' },
+            { text: sec.content, style: 'normal', margin: [0, 0, 0, 8] },
+          ]),
+
+          ...(analysis.recommendations?.length ? [
+            { text: 'Recomendações Prioritárias', style: 'subheader' },
+            { ul: analysis.recommendations.map(r => `${r.priority}: ${r.action} — Prazo: ${r.timeline} — Investimento: ${r.investment} — Responsável: ${r.responsible} — Impacto: ${r.expectedImpact}`), style: 'normal', margin: [0, 0, 0, 12] },
+          ] : []),
+
+          { text: definitions.title, style: 'subheader' },
+          { ul: bulletsFromMultiline(definitions.content), style: 'normal', margin: [0, 0, 0, 12] },
+
+          { text: 'Conclusões', style: 'subheader' },
+          { ul: [
+            `Pontos Positivos: ${conclusions.positive}`,
+            `Desafios: ${conclusions.challenges}`,
+            `Próximos Passos: ${conclusions.nextSteps}`,
+          ], style: 'normal' },
+        ],
+        styles: {
+          header: { fontSize: 22, bold: true, margin: [0, 0, 0, 8] },
+          subheader: { fontSize: 16, bold: true, color: '#111', margin: [0, 10, 0, 6] },
+          sectionTitle: { fontSize: 14, bold: true, margin: [0, 6, 0, 4] },
+          normal: { fontSize: 13.5, lineHeight: 1.45, color: '#000' },
+          meta: { fontSize: 10.5, color: '#555' },
+        },
+        defaultStyle: { font: 'Roboto' },
+        footer: (currentPage: number, pageCount: number) => ({
+          text: `Página ${currentPage} de ${pageCount}`,
+          alignment: 'right', margin: [0, 8, 20, 0], fontSize: 9, color: '#666'
+        }),
+      };
+
+      pdfMakeLocal.createPdf(docDefinition).download(`relatorio-saude-${Date.now()}.pdf`);
+
+      toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao gerar o PDF. Tente novamente.",
-        variant: "destructive"
-      });
+      toast({ title: 'Erro', description: 'Erro ao gerar o PDF. Tente novamente.', variant: 'destructive' });
     }
   };
 
