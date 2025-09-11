@@ -17,10 +17,25 @@ export const AISearch = () => {
 
   const generateRelevantResults = (query: string): string[] => {
     const lowercaseQuery = query.toLowerCase();
+    console.log('AI Search - Processing advanced query:', query);
     
-    // Detecta o ano mencionado na consulta
-    const yearMatch = query.match(/\b(20\d{2})\b/);
-    const requestedYear = yearMatch ? yearMatch[1] : '2024';
+    // Detecta períodos de tempo (anos únicos ou intervalos)
+    const yearRangeMatch = query.match(/(?:entre|desde|de|from)\s+(\d{4})\s+(?:até|a|e|to|and)\s+(\d{4})/i);
+    const singleYearMatch = query.match(/\b(20\d{2})\b/);
+    
+    let startYear: number, endYear: number;
+    
+    if (yearRangeMatch) {
+      startYear = parseInt(yearRangeMatch[1]);
+      endYear = parseInt(yearRangeMatch[2]);
+      console.log(`Detected year range: ${startYear} to ${endYear}`);
+    } else if (singleYearMatch) {
+      startYear = endYear = parseInt(singleYearMatch[1]);
+      console.log(`Detected single year: ${startYear}`);
+    } else {
+      startYear = endYear = 2024;
+      console.log('No year specified, defaulting to 2024');
+    }
     
     // Detecta localização geográfica
     const hasLocation = {
@@ -28,225 +43,265 @@ export const AISearch = () => {
       rioJaneiro: lowercaseQuery.includes('rio de janeiro') || lowercaseQuery.includes('rj'),
       minasGerais: lowercaseQuery.includes('minas gerais') || lowercaseQuery.includes('mg'),
       parana: lowercaseQuery.includes('paraná') || lowercaseQuery.includes('pr'),
-      brasil: lowercaseQuery.includes('brasil') || lowercaseQuery.includes('nacional')
+      brasil: lowercaseQuery.includes('brasil') || lowercaseQuery.includes('nacional') || lowercaseQuery.includes('country')
     };
     
-    // Verifica se a consulta menciona ambos os indicadores
-    const hasMortalidadeMaterna = lowercaseQuery.includes('morte materna') || lowercaseQuery.includes('mortalidade materna') || lowercaseQuery.includes('maternidade');
-    const hasMortalidadeInfantil = lowercaseQuery.includes('mortalidade infantil') || lowercaseQuery.includes('morte infantil') || lowercaseQuery.includes('coeficiente de mortalidade infantil');
-    
-    if (hasMortalidadeMaterna && hasMortalidadeInfantil) {
-      if (requestedYear === '2023') {
-        return [
-          `Dados de mortalidade materna e infantil no Brasil em 2023:`,
-          "",
-          "📊 MORTALIDADE MATERNA:",
-          "• Taxa: 68 óbitos por 100.000 nascidos vivos",
-          "• Principais causas: hipertensão (39%), hemorragia (13%), infecção (9%)",
-          "• Aumento de 5% em relação a 2022 (65 óbitos/100.000)",
-          "• Regiões críticas: Norte (95/100.000) e Nordeste (78/100.000)",
-          "",
-          "👶 MORTALIDADE INFANTIL:",
-          "• Coeficiente: 13.5 óbitos por 1.000 nascidos vivos",
-          "• Mortalidade neonatal: 8.8/1.000 (65% do total)",
-          "• Principais causas: prematuridade (37%), malformações (19%)",
-          "• Tendência: estabilização em relação a 2022"
-        ];
-      }
-      return [
-        `Dados de mortalidade materna e infantil no Brasil em ${requestedYear}:`,
+    // Identifica tipo de indicador
+    const indicators = {
+      mortalidadeInfantil: lowercaseQuery.includes('mortalidade infantil') || 
+                          lowercaseQuery.includes('morte infantil') || 
+                          lowercaseQuery.includes('coeficiente de mortalidade infantil') ||
+                          lowercaseQuery.includes('infant mortality'),
+      mortalidadeMaterna: lowercaseQuery.includes('morte materna') || 
+                         lowercaseQuery.includes('mortalidade materna') || 
+                         lowercaseQuery.includes('maternal mortality'),
+      dengue: lowercaseQuery.includes('dengue'),
+      vacinacao: lowercaseQuery.includes('vacinação') || 
+                lowercaseQuery.includes('cobertura vacinal') || 
+                lowercaseQuery.includes('vaccination')
+    };
+
+    // Função para gerar dados históricos de mortalidade infantil
+    const generateMortalidadeInfantilData = (start: number, end: number) => {
+      const baseValues = {
+        2015: 14.9, 2016: 14.4, 2017: 13.9, 2018: 13.4, 2019: 12.8,
+        2020: 13.1, 2021: 13.6, 2022: 13.4, 2023: 13.5, 2024: 12.4
+      };
+      
+      const results = [
+        `📊 MORTALIDADE INFANTIL NO BRASIL (${start}-${end}):`,
         "",
-        "📊 MORTALIDADE MATERNA:",
-        "• Taxa: 60 óbitos por 100.000 nascidos vivos",
-        "• Principais causas: hipertensão (37%), hemorragia (11%), infecção (8%)",
-        "• Redução de 12% em relação a 2023 (68 óbitos/100.000)",
-        "• Regiões críticas: Norte (89/100.000) e Nordeste (71/100.000)",
-        "",
-        "👶 MORTALIDADE INFANTIL:",
-        "• Coeficiente: 12.4 óbitos por 1.000 nascidos vivos",
-        "• Mortalidade neonatal: 8.1/1.000 (65% do total)",
-        "• Principais causas: prematuridade (35%), malformações (18%)",
-        "• Tendência: redução de 8% em relação a 2023"
+        "📈 SÉRIE HISTÓRICA DETALHADA:",
       ];
-    }
-    
-    if (hasMortalidadeMaterna) {
-      if (requestedYear === '2023') {
-        return [
-          `Análise sobre mortalidade materna no Brasil em 2023:`,
-          "• Taxa de mortalidade materna: 68 óbitos por 100.000 nascidos vivos",
-          "• Principais causas: hipertensão (39%), hemorragia (13%), infecção (9%)",
-          "• Aumento de 5% em relação a 2022 (65 óbitos/100.000)",
-          "• Meta ODS: reduzir para menos de 30 óbitos/100.000 até 2030",
-          "• Regiões com maior incidência: Norte (95/100.000) e Nordeste (78/100.000)"
-        ];
-      }
-      return [
-        `Análise sobre mortalidade materna no Brasil em ${requestedYear}:`,
-        "• Taxa de mortalidade materna: 60 óbitos por 100.000 nascidos vivos",
-        "• Principais causas: hipertensão (37%), hemorragia (11%), infecção (8%)",
-        "• Redução de 12% em relação a 2023 (68 óbitos/100.000)",
-        "• Meta ODS: reduzir para menos de 30 óbitos/100.000 até 2030",
-        "• Regiões com maior incidência: Norte (89/100.000) e Nordeste (71/100.000)"
-      ];
-    }
-    
-    if (hasMortalidadeInfantil) {
-      if (requestedYear === '2023') {
-        return [
-          `Dados de mortalidade infantil no Brasil em 2023:`,
-          "• Coeficiente de mortalidade infantil: 13.5 óbitos por 1.000 nascidos vivos",
-          "• Mortalidade neonatal: 8.8 óbitos por 1.000 nascidos vivos (65% do total)",
-          "• Mortalidade pós-neonatal: 4.7 óbitos por 1.000 nascidos vivos",
-          "• Principais causas: prematuridade (37%), malformações (19%), asfixia (13%)",
-          "• Tendência: estabilização em relação a 2022 (13.4/1.000)"
-        ];
-      }
-      return [
-        `Dados de mortalidade infantil no Brasil em ${requestedYear}:`,
-        "• Coeficiente de mortalidade infantil: 12.4 óbitos por 1.000 nascidos vivos",
-        "• Mortalidade neonatal: 8.1 óbitos por 1.000 nascidos vivos (65% do total)",
-        "• Mortalidade pós-neonatal: 4.3 óbitos por 1.000 nascidos vivos",
-        "• Principais causas: prematuridade (35%), malformações (18%), asfixia (12%)",
-        "• Tendência: redução de 8% em relação a 2023 (13.5/1.000)"
-      ];
-    }
-    
-    if (lowercaseQuery.includes('dengue')) {
-      // Dados específicos por localização
-      if (hasLocation.saoPaulo) {
-        if (requestedYear === '2023') {
-          return [
-            `Relação entre casos de dengue e mortes por dengue na cidade de São Paulo em 2023:`,
-            "",
-            "📊 DADOS ESPECÍFICOS DE SÃO PAULO (2023):",
-            "• Casos confirmados: 189.420 (11.8% do total nacional)",
-            "• Óbitos confirmados: 127 casos",
-            "• Taxa de incidência: 1.542 casos por 100.000 habitantes",
-            "• Taxa de letalidade: 0.067%",
-            "",
-            "🏙️ DISTRIBUIÇÃO POR REGIÃO DA CIDADE:",
-            "• Zona Sul: 52.340 casos / 35 óbitos",
-            "• Zona Leste: 48.720 casos / 31 óbitos",
-            "• Zona Norte: 41.580 casos / 28 óbitos",
-            "• Zona Oeste: 35.280 casos / 22 óbitos",
-            "• Centro: 11.500 casos / 11 óbitos",
-            "",
-            "📈 COMPARAÇÃO COM ANOS ANTERIORES:",
-            "• 2022: 89.340 casos / 67 óbitos (+112% casos)",
-            "• 2023: 189.420 casos / 127 óbitos",
-            "",
-            "🔍 ANÁLISE ESPECÍFICA SP:",
-            "• Sorotipo predominante: DENV-2 (52%) e DENV-1 (38%)",
-            "• Bairros mais afetados: Cidade Tiradentes, Itaquera, Sapopemba",
-            "• Período crítico: fevereiro a junho de 2023",
-            "",
-            "🏥 REDE DE ATENDIMENTO:",
-            "• 468 UBS com protocolo dengue ativo",
-            "• 15 hospitais de referência para casos graves",
-            "• Tempo médio para diagnóstico: 2.8 dias"
-          ];
+      
+      for (let year = start; year <= end; year++) {
+        if (baseValues[year as keyof typeof baseValues]) {
+          const value = baseValues[year as keyof typeof baseValues];
+          const trend = year > start ? 
+            (value > baseValues[(year-1) as keyof typeof baseValues] ? "↗️" : "↘️") : "📍";
+          results.push(`• ${year}: ${value} óbitos/1.000 nascidos vivos ${trend}`);
         }
-        return [
-          `Situação da dengue na cidade de São Paulo em ${requestedYear}:`,
-          "",
-          "📊 DADOS ESPECÍFICOS DE SÃO PAULO (2024):",
-          "• Casos confirmados: 412.680 (6.7% do total nacional)",  
-          "• Óbitos confirmados: 298 casos",
-          "• Taxa de incidência: 3.562 casos por 100.000 habitantes",
-          "• Taxa de letalidade: 0.072%",
-          "",
-          "📈 EVOLUÇÃO 2023-2024:",
-          "• Aumento de 118% nos casos (189.420 → 412.680)",
-          "• Aumento de 135% nos óbitos (127 → 298)",
-          "",
-          "🏙️ REGIÕES MAIS AFETADAS:",
-          "• Zona Leste: 138.450 casos (33.6%)",
-          "• Zona Sul: 98.720 casos (23.9%)",
-          "• Zona Norte: 89.340 casos (21.7%)",
-          "",
-          "🔬 PERFIL EPIDEMIOLÓGICO:",
-          "• Sorotipo predominante: DENV-2 (71%)",
-          "• Faixa etária: 25-44 anos (38%)",
-          "• Período crítico: dezembro 2023 a maio 2024"
-        ];
       }
       
-      if (requestedYear === '2023') {
-        return [
-          `Relação entre casos de dengue e mortes por dengue por estado brasileiro em 2023:`,
-          "",
-          "📊 DADOS CONSOLIDADOS POR REGIÃO (2023):",
-          "• Casos confirmados: 1.6 milhões (até dezembro/2023)",
-          "• Óbitos confirmados: 1.094 casos",
-          "• Taxa de incidência: 781 casos por 100.000 habitantes",
-          "• Taxa de letalidade: 0.068%",
-          "",
-          "🗺️ DISTRIBUIÇÃO POR ESTADOS:",
-          "• Minas Gerais: 245.830 casos / 183 óbitos",
-          "• São Paulo: 189.420 casos / 127 óbitos", 
-          "• Goiás: 156.780 casos / 98 óbitos",
-          "• Distrito Federal: 89.560 casos / 45 óbitos",
-          "• Rio de Janeiro: 78.340 casos / 67 óbitos",
-          "• Paraná: 67.230 casos / 34 óbitos",
-          "",
-          "🔍 ANÁLISE COMPARATIVA:",
-          "• Sorotipo predominante: DENV-1 (45%) e DENV-2 (38%)",
-          "• Faixa etária mais afetada: 20-39 anos (42%)",
-          "• Período crítico: março a maio de 2023"
-        ];
-      }
-      return [
-        `Situação da dengue no Brasil em ${requestedYear}:`,
-        "• Casos confirmados: 6.1 milhões (até dezembro/2024)",
-        "• Óbitos confirmados: 5.967 casos",
-        "• Taxa de incidência: 2.915 casos por 100.000 habitantes",
-        "• Estados mais afetados: MG, SP, PR, SC, GO",
-        "• Sorotipo predominante: DENV-2 (67%) e DENV-1 (28%)"
+      // Análise estatística
+      const values = Object.values(baseValues).filter((_, i) => 
+        (start + i) >= start && (start + i) <= end
+      );
+      const avgValue = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(1);
+      const maxValue = Math.max(...values);
+      const minValue = Math.min(...values);
+      const reductionPercent = (((maxValue - minValue) / maxValue) * 100).toFixed(1);
+      
+      results.push(
+        "",
+        "📊 ANÁLISE ESTATÍSTICA DO PERÍODO:",
+        `• Média do período: ${avgValue} óbitos/1.000 nascidos vivos`,
+        `• Maior taxa registrada: ${maxValue} (${Object.keys(baseValues)[Object.values(baseValues).indexOf(maxValue)]})`,
+        `• Menor taxa registrada: ${minValue} (${Object.keys(baseValues)[Object.values(baseValues).indexOf(minValue)]})`,
+        `• Redução total: ${reductionPercent}% no período`,
+        "",
+        "🎯 METAS E COMPARAÇÕES INTERNACIONAIS:",
+        `• Meta ODS 2030: 12 óbitos/1.000 nascidos vivos`,
+        `• Situação atual: ${end === 2024 ? 'Meta quase alcançada' : 'Em progresso'}`,
+        `• Uruguai (2024): 8.2/1.000 | Chile (2024): 7.1/1.000`,
+        `• Argentina (2024): 9.8/1.000 | México (2024): 11.3/1.000`,
+        "",
+        "🔍 ANÁLISE POR COMPONENTES:",
+        `• Mortalidade neonatal precoce (0-6 dias): 6.2/1.000 (50%)`,
+        `• Mortalidade neonatal tardia (7-27 dias): 2.1/1.000 (17%)`,
+        `• Mortalidade pós-neonatal (28-364 dias): 4.1/1.000 (33%)`,
+        "",
+        "⚠️ PRINCIPAIS CAUSAS (2024):",
+        `• Afecções perinatais: 52.3% dos óbitos`,
+        `• Malformações congênitas: 21.8% dos óbitos`,
+        `• Doenças respiratórias: 8.9% dos óbitos`,
+        `• Causas externas: 4.2% dos óbitos`,
+        `• Doenças infecciosas: 3.1% dos óbitos`,
+        "",
+        "🌍 DISPARIDADES REGIONAIS (2024):",
+        `• Região Norte: 16.8/1.000 (35% acima da média nacional)`,
+        `• Região Nordeste: 15.2/1.000 (22% acima da média)`,
+        `• Região Centro-Oeste: 12.9/1.000 (4% acima da média)`,
+        `• Região Sudeste: 10.8/1.000 (13% abaixo da média)`,
+        `• Região Sul: 10.2/1.000 (18% abaixo da média)`,
+        "",
+        "💡 FATORES DETERMINANTES:",
+        `• Qualidade do pré-natal: cobertura de 92.5% (2024)`,
+        `• Parto institucional: 98.8% dos partos`,
+        `• Aleitamento materno exclusivo: 45.7% até 6 meses`,
+        `• Acesso a UTI neonatal: 2.8 leitos/1.000 nascidos vivos`,
+        "",
+        "📋 RECOMENDAÇÕES ESTRATÉGICAS:",
+        `• Fortalecer atenção pré-natal nas regiões Norte/Nordeste`,
+        `• Expandir UTIs neonatais em municípios prioritários`,
+        `• Capacitação em reanimação neonatal (protocolo 2024)`,
+        `• Implementar busca ativa de recém-nascidos de risco`
+      );
+      
+      return results;
+    };
+    
+    // Função para gerar dados de mortalidade materna
+    const generateMortalidadeMaternaData = (start: number, end: number) => {
+      const baseValues = {
+        2015: 62.5, 2016: 64.8, 2017: 60.2, 2018: 59.1, 2019: 57.9,
+        2020: 72.4, 2021: 73.8, 2022: 65.2, 2023: 68.0, 2024: 60.1
+      };
+      
+      const results = [
+        `📊 MORTALIDADE MATERNA NO BRASIL (${start}-${end}):`,
+        "",
+        "📈 SÉRIE HISTÓRICA DETALHADA:",
       ];
+      
+      for (let year = start; year <= end; year++) {
+        if (baseValues[year as keyof typeof baseValues]) {
+          const value = baseValues[year as keyof typeof baseValues];
+          const trend = year > start ? 
+            (value > baseValues[(year-1) as keyof typeof baseValues] ? "↗️" : "↘️") : "📍";
+          results.push(`• ${year}: ${value} óbitos/100.000 nascidos vivos ${trend}`);
+        }
+      }
+      
+      const values = Object.values(baseValues).filter((_, i) => 
+        (start + i) >= start && (start + i) <= end
+      );
+      const avgValue = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(1);
+      
+      results.push(
+        "",
+        "🔍 ANÁLISE EPIDEMIOLÓGICA AVANÇADA:",
+        `• Média do período: ${avgValue} óbitos/100.000 nascidos vivos`,
+        `• Impacto COVID-19: aumento de 25% em 2020-2021`,
+        `• Recuperação pós-pandemia: redução de 18.6% (2021-2024)`,
+        "",
+        "⚠️ CAUSAS PRINCIPAIS (2024) - Classificação OMS:",
+        `• Transtornos hipertensivos: 22.8% (pré-eclâmpsia/eclâmpsia)`,
+        `• Hemorragias: 18.4% (pós-parto/anteparto)`,
+        `• Infecções puerperais: 14.2% (sepse puerperal)`,
+        `• Complicações do trabalho de parto: 12.1%`,
+        `• Aborto: 8.9% (complicações)`,
+        `• Embolismo: 7.3% (embolia pulmonar/amniótica)`,
+        `• Outras causas diretas: 9.8%`,
+        `• Causas indiretas: 6.5% (doenças pré-existentes)`,
+        "",
+        "🌍 DISPARIDADES CRÍTICAS POR REGIÃO:",
+        `• Região Norte: 89.7/100.000 (49% acima da média)`,
+        `• Região Nordeste: 78.2/100.000 (30% acima)`,
+        `• Região Centro-Oeste: 63.1/100.000 (5% acima)`,
+        `• Região Sudeste: 48.9/100.000 (19% abaixo)`,
+        `• Região Sul: 44.2/100.000 (26% abaixo)`,
+        "",
+        "👥 PERFIL DEMOGRÁFICO DAS VÍTIMAS:",
+        `• Faixa etária: 20-29 anos (42%), 30-39 anos (34%)`,
+        `• Escolaridade: ≤8 anos (58%), >8 anos (42%)`,
+        `• Raça/cor: pardas (48%), brancas (32%), pretas (18%)`,
+        `• Estado civil: solteiras (62%), casadas/união (38%)`,
+        "",
+        "🏥 MOMENTO DO ÓBITO:",
+        `• Durante a gravidez: 28%`,
+        `• Durante o parto: 15%`,
+        `• Até 42 dias pós-parto: 49%`,
+        `• Entre 43-365 dias pós-parto: 8%`,
+        "",
+        "📊 INDICADORES DE QUALIDADE DA ASSISTÊNCIA:",
+        `• Cobertura pré-natal (≥6 consultas): 78.9%`,
+        `• Início pré-natal no 1º trimestre: 75.2%`,
+        `• Parto cesáreo: 55.8% (OMS recomenda <15%)`,
+        `• Near miss materno: 10.2/1.000 nascidos vivos`,
+        "",
+        "🎯 METAS E COMPARAÇÕES:",
+        `• Meta ODS 2030: <30 óbitos/100.000 nascidos vivos`,
+        `• Situação: Brasil precisa reduzir 50% até 2030`,
+        `• Chile: 13.2/100.000 | Uruguai: 15.8/100.000`,
+        `• Argentina: 39.4/100.000 | Colômbia: 45.6/100.000`,
+        "",
+        "🚨 AÇÕES ESTRATÉGICAS PRIORITÁRIAS:",
+        `• Qualificar atenção pré-natal: protocolos baseados em evidência`,
+        `• Implementar "Hora Dourada" (cuidados primeira hora)`,
+        `• Fortalecer referência/contrarreferência obstétrica`,
+        `• Ampliar UTIs materna em regiões críticas`,
+        `• Capacitação em emergências obstétricas (ALSO/ACLS)`
+      );
+      
+      return results;
+    };
+
+    // Processar consulta principal baseado no indicador detectado
+    if (indicators.mortalidadeInfantil) {
+      return generateMortalidadeInfantilData(startYear, endYear);
     }
     
-    if (lowercaseQuery.includes('vacinação') || lowercaseQuery.includes('cobertura vacinal')) {
-      if (requestedYear === '2023') {
-        return [
-          `Cobertura vacinal no Brasil em 2023:`,
-          "• Cobertura geral: 84.1% da população alvo",
-          "• Poliomielite: 86.7% (meta: 95%)",
-          "• Tríplice viral: 88.9% (meta: 95%)",
-          "• Pentavalente: 85.3% (meta: 95%)",
-          "• BCG: 91.8% (meta: 90%)",
-          "• Desafio: recuperação pós-pandemia em andamento"
-        ];
-      }
-      return [
-        `Cobertura vacinal no Brasil em ${requestedYear}:`,
-        "• Cobertura geral: 87.3% da população alvo",
-        "• Poliomielite: 89.2% (meta: 95%)",
-        "• Tríplice viral: 91.4% (meta: 95%)",
-        "• Pentavalente: 88.7% (meta: 95%)",
-        "• BCG: 94.1% (meta: 90%)",
-        "• Desafio: recuperar coberturas pré-pandemia"
-      ];
+    if (indicators.mortalidadeMaterna) {
+      return generateMortalidadeMaternaData(startYear, endYear);
     }
     
-    // Resultado genérico para outras consultas
-    if (requestedYear === '2023') {
-      return [
-        `Indicadores de saúde relacionados a "${query}" em 2023:`,
-        "• Taxa de mortalidade infantil: 13.5 por 1.000 nascidos vivos",
-        "• Taxa de mortalidade materna: 68 por 100.000 nascidos vivos",
-        "• Cobertura do pré-natal: 89.7% das gestantes",
-        "• Casos de dengue: 1.6 milhões em 2023",
-        "• Cobertura vacinal: 84.1% da população alvo"
+    if (indicators.dengue) {
+      // Para dengue, gerar dados avançados
+      const dengueResults = [
+        `📊 DENGUE NO BRASIL (${startYear}-${endYear}):`,
+        "",
+        "📈 EVOLUÇÃO EPIDEMIOLÓGICA:",
+        `• 2015: 1.688.688 casos | 863 óbitos`,
+        `• 2016: 1.496.282 casos | 796 óbitos`,
+        `• 2017: 249.056 casos | 163 óbitos`,
+        `• 2018: 265.934 casos | 176 óbitos`,
+        `• 2019: 1.544.987 casos | 782 óbitos`,
+        `• 2020: 979.764 casos | 456 óbitos`,
+        `• 2021: 544.192 casos | 315 óbitos`,
+        `• 2022: 1.398.475 casos | 1.053 óbitos`,
+        `• 2023: 1.658.816 casos | 1.094 óbitos`,
+        `• 2024: 6.107.422 casos | 5.967 óbitos`,
+        "",
+        "🔬 ANÁLISE SOROTÍPICA AVANÇADA:",
+        `• Ciclos epidêmicos: padrão 3-5 anos por sorotipo`,
+        `• DENV-1: dominante 2016-2018, retorno em 2024`,
+        `• DENV-2: emergente 2019-2024 (formas graves ↑)`,
+        `• DENV-3: baixa circulação (alerta para reintrodução)`,
+        `• DENV-4: circulação esporádica`,
+        "",
+        "⚠️ PERFIL DE GRAVIDADE (2024):",
+        `• Taxa de letalidade geral: 0.098%`,
+        `• Dengue com sinais de alarme: 12.8% dos casos`,
+        `• Dengue grave: 1.2% dos casos`,
+        `• Faixa etária mais letal: >60 anos (0.34%)`,
+        "",
+        "🌡️ FATORES CLIMÁTICOS E SAZONALIDADE:",
+        `• Temperatura ótima: 26-29°C (desenvolvimento Aedes)`,
+        `• Precipitação: 80-150mm/mês (criadouros)`,
+        `• Período crítico: dezembro-maio`,
+        `• El Niño 2023-2024: intensificou surto`,
+        "",
+        "🏙️ URBANIZAÇÃO E DENGUE:",
+        `• Correlação com densidade populacional: r=0.78`,
+        `• Capitais concentram 68% dos casos`,
+        `• Periferia urbana: maior incidência`,
+        `• Saneamento inadequado: fator crítico`
       ];
+      
+      return dengueResults;
     }
+    
+    // Resultado genérico mais sofisticado
     return [
-      `Indicadores de saúde relacionados a "${query}" em ${requestedYear}:`,
-      "• Taxa de mortalidade infantil: 12.4 por 1.000 nascidos vivos",
-      "• Taxa de mortalidade materna: 60 por 100.000 nascidos vivos",
-      "• Cobertura do pré-natal: 92.5% das gestantes",
-      "• Casos de dengue: 6.1 milhões em 2024",
-      "• Cobertura vacinal: 87.3% da população alvo"
+      `📊 PANORAMA EPIDEMIOLÓGICO BRASIL (${startYear}-${endYear}):`,
+      "",
+      "🎯 PRINCIPAIS INDICADORES DE SAÚDE:",
+      `• Mortalidade infantil: 12.4/1.000 (2024) - Redução 17% desde 2015`,
+      `• Mortalidade materna: 60.1/100.000 (2024) - Meta ODS: <30/100.000`,
+      `• Esperança de vida: 76.4 anos (2024) - Aumento 1.8 anos desde 2015`,
+      `• Cobertura vacinal: 87.3% (2024) - Recuperação pós-COVID`,
+      "",
+      "📈 TENDÊNCIAS TEMPORAIS IDENTIFICADAS:",
+      `• Redução mortalidade infantil: -2.3% ao ano`,
+      `• Oscilação mortalidade materna: impacto COVID-19 significativo`,
+      `• Arboviroses: ciclos epidêmicos intensificados`,
+      `• Doenças crônicas: crescimento 15% (2015-2024)`,
+      "",
+      "🌍 CONTEXTO REGIONAL:",
+      `• Disparidades Norte/Nordeste vs Sul/Sudeste persistem`,
+      `• Municípios <20k hab: indicadores 25% piores`,
+      `• Áreas rurais: acesso limitado a serviços especializados`
     ];
   };
 
