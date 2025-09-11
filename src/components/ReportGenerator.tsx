@@ -153,9 +153,9 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
 
     try {
       // Dimensões A4 e largura alvo calculada
-      const A4 = { widthMM: 210, heightMM: 297, marginMM: 10 };
-      const contentWidthMM = A4.widthMM - A4.marginMM * 2; // 190mm
-      const contentHeightMM = A4.heightMM - A4.marginMM * 2; // 277mm
+      const A4 = { widthMM: 210, heightMM: 297, marginMM: 0 };
+      const contentWidthMM = A4.widthMM; // largura total
+      const contentHeightMM = A4.heightMM; // altura total
 
       const cloneWidthPx = Math.round((contentWidthMM / 25.4) * 96); // px @96DPI
       const scale = 3; // resolução alta para impressão nítida
@@ -193,9 +193,15 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
       const xPos = A4.marginMM;
       const yPos = A4.marginMM;
 
-      // mm por pixel baseado na largura alvo (cloneWidthPx) e no scale
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      console.log('[PDF DEBUG] page(mm)', { pdfWidth, pdfHeight });
+
+      // mm por pixel baseado na largura real do canvas e largura útil do PDF
       const mmPerPx = contentWidthMM / canvas.width;
       const contentHeightPx = Math.floor(contentHeightMM / mmPerPx);
+
+      console.log('[PDF DEBUG] canvas(px)', { w: canvas.width, h: canvas.height, mmPerPx, contentWidthMM, contentHeightMM, contentHeightPx });
 
       const totalPages = Math.ceil(canvas.height / contentHeightPx);
       const overlap = 2; // sobreposição para esconder costuras
@@ -229,10 +235,10 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
           canvas.width, sliceHeightPx
         );
 
-        const imgData = sliceCanvas.toDataURL('image/jpeg', 0.98);
+        const imgData = sliceCanvas.toDataURL('image/png', 1.0);
         const sliceHeightMM = sliceCanvas.height * mmPerPx;
 
-        pdf.addImage(imgData, 'JPEG', xPos, yPos, contentWidthMM, sliceHeightMM, undefined, 'SLOW');
+        pdf.addImage(imgData, 'PNG', xPos, yPos, contentWidthMM, sliceHeightMM, undefined, 'MEDIUM');
       }
 
       const fileName = `Relatorio_${panelData.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
