@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import type { PanelData } from "@/types";
+import { createPrintableReport } from "@/utils/createPrintableReport";
 
 interface ReportGeneratorProps {
   panelData: PanelData;
@@ -151,61 +152,36 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
     setIsDownloading(true);
 
     try {
-      const reportElement = document.querySelector('[data-report-content]') as HTMLElement;
-      if (!reportElement) {
-        throw new Error('Elemento do relatório não encontrado');
-      }
-
-      // A4 real com margens menores para texto maior
+      // Dimensões A4 e largura alvo calculada
       const A4 = { widthMM: 210, heightMM: 297, marginMM: 10 };
       const contentWidthMM = A4.widthMM - A4.marginMM * 2; // 190mm
       const contentHeightMM = A4.heightMM - A4.marginMM * 2; // 277mm
 
-      // Largura alvo do clone (~190mm em 96DPI)
-      const cloneWidthPx = 720;
+      const cloneWidthPx = Math.round((contentWidthMM / 25.4) * 96); // px @96DPI
       const scale = 2; // alta qualidade
 
-      const canvas = await html2canvas(reportElement, {
+      // Monta um template limpo, fora do diálogo/portais para evitar transform/banding
+      const printableEl = createPrintableReport(panelData, {
+        date: currentDate,
+        executiveSummary: generateExecutiveSummary(),
+        insights: generateInsights(),
+        recommendations: generateRecommendations(),
+        widthPx: cloneWidthPx,
+        baseFontPx: 18,
+      });
+      document.body.appendChild(printableEl);
+
+      const canvas = await html2canvas(printableEl, {
         scale,
         useCORS: true,
         allowTaint: false,
         foreignObjectRendering: true,
         backgroundColor: '#ffffff',
         logging: false,
-        onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.querySelector('[data-report-content]') as HTMLElement;
-          // CSS global no clone para evitar faixas/gradientes e garantir tipografia legível
-          const style = clonedDoc.createElement('style');
-          style.textContent = `
-            [data-report-content], [data-report-content] * { 
-              background: #ffffff !important; 
-              box-shadow: none !important; 
-              filter: none !important; 
-              text-rendering: optimizeLegibility; 
-              -webkit-font-smoothing: antialiased;
-              -moz-osx-font-smoothing: grayscale;
-            }
-          `;
-          clonedDoc.head.appendChild(style);
-
-          if (clonedElement) {
-            Object.assign(clonedElement.style, {
-              transform: 'none',
-              WebkitTransform: 'none',
-              position: 'relative',
-              overflow: 'visible',
-              backgroundColor: '#ffffff',
-              fontFamily: 'Arial, sans-serif',
-              fontSize: '16px',
-              lineHeight: '1.65',
-              padding: '24px',
-              boxSizing: 'border-box',
-              width: `${cloneWidthPx}px`,
-              maxWidth: `${cloneWidthPx}px`,
-            } as any);
-          }
-        }
       });
+
+      // Remover o elemento temporário após a captura
+      document.body.removeChild(printableEl);
 
       const pdf = new jsPDF({
         orientation: 'portrait',
