@@ -939,20 +939,26 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
         // Abra em nova aba para evitar navegação da SPA; fallback para download seguro
         pdf.getBlob((blob: Blob) => {
           const url = URL.createObjectURL(blob);
-          const newWin = window.open(url, '_blank', 'noopener,noreferrer');
-          if (!newWin) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            a.rel = 'noopener';
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+          // Se a aba pré-aberta existir, usa ela; caso contrário, usa iframe oculto (evita navegação da SPA)
+          if (previewWin) {
+            try {
+              previewWin.location.href = url;
+            } catch {
+              previewWin.document.body.innerHTML = `<iframe src="${url}" style="width:100%;height:100%;border:0"></iframe>`;
+            }
+          } else {
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = url;
+            document.body.appendChild(iframe);
+            // remove o iframe e URL depois
+            setTimeout(() => {
+              document.body.removeChild(iframe);
+              URL.revokeObjectURL(url);
+            }, 60000);
           }
           setIsGeneratingPdf(false);
           toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
-          setTimeout(() => URL.revokeObjectURL(url), 60000);
         });
 
       } catch (error) {
