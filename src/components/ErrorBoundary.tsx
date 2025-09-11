@@ -36,8 +36,14 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   render() {
     if (this.state.hasError) {
       const err = this.state.error as any;
-      const message = (err && (err.message || String(err))) || "Erro desconhecido";
-      const stack = (err && err.stack) || "";
+      const toSafeString = (val: any): string => {
+        if (val === null || val === undefined) return "";
+        if (typeof val === "string") return val;
+        try { return JSON.stringify(val, null, 2); } catch { return String(val); }
+      };
+      const rawMessage = (err && (typeof err.message !== "undefined" ? err.message : err));
+      const message = toSafeString(rawMessage) || "Erro desconhecido";
+      const stack = (err && typeof err.stack === "string") ? err.stack : "";
       return (
         <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6">
           <div className="max-w-2xl w-full space-y-4 text-center">
