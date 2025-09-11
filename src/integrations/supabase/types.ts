@@ -155,25 +155,46 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
+          bio: string | null
           created_at: string
+          department: string | null
           full_name: string | null
           id: string
+          location: string | null
+          organization: string | null
+          phone: string | null
+          preferences: Json | null
           role: Database["public"]["Enums"]["app_role"]
           updated_at: string
           user_id: string
         }
         Insert: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          department?: string | null
           full_name?: string | null
           id?: string
+          location?: string | null
+          organization?: string | null
+          phone?: string | null
+          preferences?: Json | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           user_id: string
         }
         Update: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          department?: string | null
           full_name?: string | null
           id?: string
+          location?: string | null
+          organization?: string | null
+          phone?: string | null
+          preferences?: Json | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           user_id?: string
@@ -228,7 +249,12 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "manager" | "analyst" | "viewer"
+      app_role:
+        | "admin"
+        | "manager"
+        | "analyst"
+        | "viewer"
+        | "healthcare_provider"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -356,7 +382,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "manager", "analyst", "viewer"],
+      app_role: [
+        "admin",
+        "manager",
+        "analyst",
+        "viewer",
+        "healthcare_provider",
+      ],
     },
   },
 } as const
