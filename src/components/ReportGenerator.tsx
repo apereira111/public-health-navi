@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import type { PanelData } from "@/types";
+import { saveAs } from 'file-saver';
 
 interface ReportGeneratorProps {
   panelData: PanelData;
@@ -196,7 +197,18 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
       const vfs = (pdfFontsMod as any).vfs ?? (pdfFontsMod as any).pdfMake?.vfs;
       if (vfs) pdfMakeLocal.vfs = vfs;
 
-      pdfMakeLocal.createPdf(docDefinition).download(fileName);
+      const pdf = pdfMakeLocal.createPdf(docDefinition);
+      const blob: Blob = await new Promise((resolve, reject) => {
+        try {
+          pdf.getBlob((b: Blob) => {
+            try { resolve(b); } catch (e) { reject(e); }
+          });
+        } catch (e) {
+          reject(e);
+        }
+      });
+
+      saveAs(blob, fileName);
 
       toast({
         title: 'PDF Gerado com Sucesso!',

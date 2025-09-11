@@ -932,27 +932,29 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
         const pdf = pdfMakeLocal.createPdf(docDefinition);
         const fileName = `relatorio-saude-${Date.now()}.pdf`;
         
-        // Gera blob e salva sem navegar; fecha o modal após sucesso
-        pdf.getBlob((blob: Blob) => {
-          try {
-            saveAs(blob, fileName);
-            console.log('HealthReport:generatePDF:saveAs:success');
-          } catch (err) {
-            console.error('HealthReport:generatePDF:saveAs:error', err);
-          } finally {
-            setIsGeneratingPdf(false);
-            toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
-            // Fecha o modal após gerar o PDF para evitar overlay branco
-            setTimeout(() => {
-              try {
-                console.log('HealthReport:onClose:auto');
-                onClose();
-              } catch (e) {
-                console.error('HealthReport:onClose:error', e);
-              }
-            }, 0);
-          }
-        });
+        try {
+          const blob: Blob = await new Promise((resolve, reject) => {
+            try {
+              pdf.getBlob((b: Blob) => {
+                try {
+                  resolve(b);
+                } catch (e) {
+                  reject(e);
+                }
+              });
+            } catch (e) {
+              reject(e);
+            }
+          });
+          saveAs(blob, fileName);
+          console.log('HealthReport:generatePDF:saveAs:success');
+          toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
+        } catch (e) {
+          console.error('HealthReport:generatePDF:getBlob:error', e);
+          toast({ title: 'Erro', description: 'Erro ao gerar o PDF. Tente novamente.', variant: 'destructive' });
+        } finally {
+          setIsGeneratingPdf(false);
+        }
 
       } catch (error) {
         console.error('Erro ao gerar PDF:', error);
