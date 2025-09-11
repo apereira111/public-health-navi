@@ -7,6 +7,8 @@ import { FileText, Download, TrendingUp, TrendingDown, Calendar, BarChart3, Save
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import type { PanelData } from "@/types";
 
 interface ReportGeneratorProps {
@@ -16,6 +18,7 @@ interface ReportGeneratorProps {
 export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -144,6 +147,70 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
     }
   };
 
+  const downloadReport = async () => {
+    setIsDownloading(true);
+    
+    try {
+      // Encontrar o elemento do relatório
+      const reportElement = document.querySelector('[data-report-content]') as HTMLElement;
+      if (!reportElement) {
+        throw new Error('Elemento do relatório não encontrado');
+      }
+
+      // Configurar html2canvas para melhor qualidade
+      const canvas = await html2canvas(reportElement, {
+        scale: 2, // Aumenta a resolução
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: '#ffffff',
+        width: reportElement.scrollWidth,
+        height: reportElement.scrollHeight,
+        scrollX: 0,
+        scrollY: 0
+      });
+
+      // Configurar o PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      
+      // Calcular dimensões para ajustar ao PDF
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      
+      // Calcular proporção para manter aspecto
+      const ratio = Math.min(pdfWidth / (imgWidth * 0.264583), pdfHeight / (imgHeight * 0.264583));
+      
+      const scaledWidth = (imgWidth * 0.264583) * ratio;
+      const scaledHeight = (imgHeight * 0.264583) * ratio;
+      
+      // Centralizar a imagem no PDF
+      const xPos = (pdfWidth - scaledWidth) / 2;
+      const yPos = (pdfHeight - scaledHeight) / 2;
+
+      pdf.addImage(imgData, 'PNG', xPos, yPos, scaledWidth, scaledHeight);
+      
+      // Salvar o PDF
+      const fileName = `Relatorio_${panelData.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
+
+      toast({
+        title: "PDF Gerado!",
+        description: "Seu relatório foi baixado com sucesso.",
+      });
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível gerar o PDF. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -160,7 +227,7 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-6">
+        <div className="space-y-6" data-report-content>
           {/* Header do Relatório */}
           <Card className="p-6 bg-accent/5">
             <div className="flex items-center justify-between mb-4">
@@ -253,9 +320,14 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
               <Save className="h-4 w-4" />
               {isSaving ? "Salvando..." : "Salvar Relatório"}
             </Button>
-            <Button variant="professional" className="gap-2">
+            <Button 
+              onClick={downloadReport}
+              disabled={isDownloading}
+              variant="professional" 
+              className="gap-2"
+            >
               <Download className="h-4 w-4" />
-              Baixar Relatório
+              {isDownloading ? "Gerando PDF..." : "Baixar Relatório"}
             </Button>
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               Fechar
