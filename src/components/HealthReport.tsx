@@ -854,13 +854,7 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
     // Use requestAnimationFrame to ensure UI updates before heavy processing
     requestAnimationFrame(async () => {
       try {
-        // Abre uma aba em branco imediatamente (sincrono ao clique) para não bloquear a SPA
-        const previewWin = window.open('', '_blank', 'noopener,noreferrer');
-        if (previewWin) {
-          previewWin.document.write("<html><head><title>Gerando PDF...</title></head><body style='font-family:sans-serif;padding:16px;color:#111'>Gerando PDF, aguarde...</body></html>");
-        }
-        
-        // Export charts as images first
+        // Export charts como imagens primeiro (não abre/edita nenhuma janela para evitar sobrescrever a SPA)
         const chartImages = await exportChartsAsImages();
 
         const pdfMakeMod = await import('pdfmake/build/pdfmake');
@@ -936,29 +930,22 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
         const pdf = pdfMakeLocal.createPdf(docDefinition);
         const fileName = `relatorio-saude-${Date.now()}.pdf`;
         
-        // Abra em nova aba para evitar navegação da SPA; fallback para download seguro
+        // Cria URL e abre em nova aba via link (sem navegar a SPA)
         pdf.getBlob((blob: Blob) => {
           const url = URL.createObjectURL(blob);
-          // Se a aba pré-aberta existir, usa ela; caso contrário, usa iframe oculto (evita navegação da SPA)
-          if (previewWin) {
-            try {
-              previewWin.location.href = url;
-            } catch {
-              previewWin.document.body.innerHTML = `<iframe src="${url}" style="width:100%;height:100%;border:0"></iframe>`;
-            }
-          } else {
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = url;
-            document.body.appendChild(iframe);
-            // remove o iframe e URL depois
-            setTimeout(() => {
-              document.body.removeChild(iframe);
-              URL.revokeObjectURL(url);
-            }, 60000);
-          }
+          const a = document.createElement('a');
+          a.href = url;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.download = fileName;
+          a.style.display = 'none';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
           setIsGeneratingPdf(false);
           toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
+          setTimeout(() => URL.revokeObjectURL(url), 60000);
         });
 
       } catch (error) {
