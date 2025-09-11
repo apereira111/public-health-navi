@@ -851,7 +851,9 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
     
     setIsGeneratingPdf(true);
     console.log('HealthReport:generatePDF:start');
-    toast({ title: 'Gerando PDF...', description: 'Processando gráficos e conteúdo. Aguarde alguns segundos...' });
+    try {
+      toast({ title: 'Gerando PDF...', description: 'Processando gráficos e conteúdo. Aguarde alguns segundos...' });
+    } catch {}
 
     // Use requestAnimationFrame to ensure UI updates before heavy processing
     requestAnimationFrame(async () => {
@@ -948,10 +950,10 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
           });
           saveAs(blob, fileName);
           console.log('HealthReport:generatePDF:saveAs:success');
-          toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
+          try { toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' }); } catch {}
         } catch (e) {
           console.error('HealthReport:generatePDF:getBlob:error', e);
-          toast({ title: 'Erro', description: 'Erro ao gerar o PDF. Tente novamente.', variant: 'destructive' });
+          try { toast({ title: 'Erro', description: 'Erro ao gerar o PDF. Tente novamente.', variant: 'destructive' }); } catch {}
         } finally {
           setIsGeneratingPdf(false);
         }
