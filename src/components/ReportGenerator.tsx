@@ -157,82 +157,98 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
         throw new Error('Elemento do relatório não encontrado');
       }
 
-      // Configurar html2canvas com configurações otimizadas
+      // Configurar html2canvas com configurações otimizadas para impressão
       const canvas = await html2canvas(reportElement, {
-        scale: 3, // Alta resolução
+        scale: 1.5, // Qualidade adequada sem exagero
         useCORS: true,
         allowTaint: false,
         backgroundColor: '#ffffff',
         logging: false,
+        width: reportElement.offsetWidth,
+        height: reportElement.offsetHeight,
         onclone: (clonedDoc) => {
-          // Aplicar estilos no documento clonado para melhor renderização
+          // Otimizar estilos para PDF
           const clonedElement = clonedDoc.querySelector('[data-report-content]') as HTMLElement;
           if (clonedElement) {
-            clonedElement.style.width = '794px'; // Largura A4 em pixels (210mm)
-            clonedElement.style.padding = '40px';
-            clonedElement.style.boxSizing = 'border-box';
+            clonedElement.style.transform = 'none';
+            clonedElement.style.webkitTransform = 'none';
+            clonedElement.style.position = 'relative';
+            clonedElement.style.overflow = 'visible';
             clonedElement.style.backgroundColor = '#ffffff';
+            clonedElement.style.fontFamily = 'Arial, sans-serif';
+            clonedElement.style.fontSize = '12px';
+            clonedElement.style.lineHeight = '1.4';
+            clonedElement.style.padding = '20px';
+            clonedElement.style.boxSizing = 'border-box';
           }
         }
       });
 
-      // Configurar o PDF
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 10; // margem de 10mm
+      // Configurar PDF A4 padrão
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+
+      const pageWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const margin = 15; // 15mm margins
+      const contentWidth = pageWidth - (2 * margin);
+      const contentHeight = pageHeight - (2 * margin);
       
-      // Converter canvas para image data com alta qualidade
-      const imgData = canvas.toDataURL('image/png', 1.0);
+      // Converter para image data
+      const imgData = canvas.toDataURL('image/png', 0.95);
       
-      // Calcular dimensões mantendo proporção
-      const availableWidth = pageWidth - (2 * margin);
-      const availableHeight = pageHeight - (2 * margin);
+      // Calcular dimensões reais do conteúdo
+      const imgWidthMM = (canvas.width * 25.4) / (96 * 1.5); // Convert pixels to mm considerando o scale
+      const imgHeightMM = (canvas.height * 25.4) / (96 * 1.5);
       
-      const canvasAspectRatio = canvas.height / canvas.width;
+      // Calcular escala para caber na página
+      const scaleX = contentWidth / imgWidthMM;
+      const scaleY = contentHeight / imgHeightMM;
+      const scale = Math.min(scaleX, scaleY, 1); // Não aumentar além do tamanho original
       
-      let finalWidth = availableWidth;
-      let finalHeight = finalWidth * canvasAspectRatio;
+      const finalWidth = imgWidthMM * scale;
+      const finalHeight = imgHeightMM * scale;
       
-      // Se a altura exceder a página, ajustar pela altura
-      if (finalHeight > availableHeight) {
-        finalHeight = availableHeight;
-        finalWidth = finalHeight / canvasAspectRatio;
-      }
+      // Centralizar na página
+      const xPos = (pageWidth - finalWidth) / 2;
+      const yPos = margin;
       
-      // Se ainda assim não couber, dividir em múltiplas páginas
-      if (finalHeight > availableHeight) {
-        // Calcular quantas páginas são necessárias
-        const pagesNeeded = Math.ceil(finalHeight / availableHeight);
-        const pageSliceHeight = canvas.height / pagesNeeded;
+      // Verificar se precisa de múltiplas páginas
+      if (finalHeight > contentHeight) {
+        const pagesNeeded = Math.ceil(finalHeight / contentHeight);
+        const heightPerPage = canvas.height / pagesNeeded;
         
         for (let page = 0; page < pagesNeeded; page++) {
           if (page > 0) pdf.addPage();
           
-          // Criar canvas para cada pedaço da página
+          // Criar canvas para esta página
           const pageCanvas = document.createElement('canvas');
           const pageCtx = pageCanvas.getContext('2d')!;
           pageCanvas.width = canvas.width;
-          pageCanvas.height = pageSliceHeight;
+          pageCanvas.height = Math.min(heightPerPage, canvas.height - (page * heightPerPage));
           
-          // Desenhar apenas a parte correspondente desta página
+          // Copiar a seção apropriada
           pageCtx.drawImage(
             canvas,
-            0, page * pageSliceHeight, // origem x, y
-            canvas.width, pageSliceHeight, // largura e altura da origem
-            0, 0, // destino x, y
-            canvas.width, pageSliceHeight // largura e altura do destino
+            0, page * heightPerPage,
+            canvas.width, pageCanvas.height,
+            0, 0,
+            canvas.width, pageCanvas.height
           );
           
-          const pageImgData = pageCanvas.toDataURL('image/png', 1.0);
-          pdf.addImage(pageImgData, 'PNG', margin, margin, availableWidth, availableHeight);
+          const pageImgData = pageCanvas.toDataURL('image/png', 0.95);
+          const pageHeightMM = (pageCanvas.height * 25.4) / (96 * 1.5);
+          const scaledPageHeight = pageHeightMM * scale;
+          
+          pdf.addImage(pageImgData, 'PNG', xPos, yPos, finalWidth, scaledPageHeight, undefined, 'MEDIUM');
         }
       } else {
-        // Centralizar na página
-        const xPos = (pageWidth - finalWidth) / 2;
-        const yPos = (pageHeight - finalHeight) / 2;
-        
-        pdf.addImage(imgData, 'PNG', xPos, yPos, finalWidth, finalHeight);
+        // Conteúdo cabe em uma página
+        pdf.addImage(imgData, 'PNG', xPos, yPos, finalWidth, finalHeight, undefined, 'MEDIUM');
       }
       
       // Salvar o PDF
