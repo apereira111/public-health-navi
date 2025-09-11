@@ -927,26 +927,22 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
 
       const pdf = pdfMakeLocal.createPdf(docDefinition);
       
-      // Use setTimeout to prevent UI blocking and ensure non-blocking behavior
+      // Create download with proper state management
+      const fileName = `relatorio-saude-${Date.now()}.pdf`;
+      
+      // Use direct download to avoid UI blocking
+      pdf.download(fileName);
+      
+      // Reset state and show success after a short delay
       setTimeout(() => {
-        pdf.getDataUrl((dataUrl: string) => {
-          // Create a temporary link and trigger download without affecting the current page
-          const link = document.createElement('a');
-          link.href = dataUrl;
-          link.download = `relatorio-saude-${Date.now()}.pdf`;
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        });
-      }, 100);
+        setIsGeneratingPdf(false);
+        toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
+      }, 1500);
 
-      toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
-      toast({ title: 'Erro', description: 'Erro ao gerar o PDF. Tente novamente.', variant: 'destructive' });
-    } finally {
       setIsGeneratingPdf(false);
+      toast({ title: 'Erro', description: 'Erro ao gerar o PDF. Tente novamente.', variant: 'destructive' });
     }
   };
 
