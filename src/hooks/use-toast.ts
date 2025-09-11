@@ -134,8 +134,31 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">;
 
+// Sanitiza valores para evitar objetos sendo passados para o toast
+const sanitizeToastValue = (value: any): string | undefined => {
+  if (value === null || value === undefined) return undefined;
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  // Se for objeto, converte para string segura
+  if (typeof value === "object") {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return "[Object]";
+    }
+  }
+  return String(value);
+};
+
 function toast({ ...props }: Toast) {
   const id = genId();
+
+  // Sanitiza title e description antes de criar o toast
+  const sanitizedProps = {
+    ...props,
+    title: props.title ? sanitizeToastValue(props.title) : undefined,
+    description: props.description ? sanitizeToastValue(props.description) : undefined,
+  };
 
   const update = (props: ToasterToast) =>
     dispatch({
@@ -147,7 +170,7 @@ function toast({ ...props }: Toast) {
   dispatch({
     type: "ADD_TOAST",
     toast: {
-      ...props,
+      ...sanitizedProps,
       id,
       open: true,
       onOpenChange: (open) => {

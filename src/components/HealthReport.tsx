@@ -966,7 +966,7 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
       } catch (error) {
         console.error('Erro ao gerar PDF:', error);
         setIsGeneratingPdf(false);
-        toast({ title: 'Erro', description: 'Erro ao gerar o PDF. Tente novamente.', variant: 'destructive' });
+        try { toast({ title: 'Erro', description: 'Erro ao gerar o PDF. Tente novamente.', variant: 'destructive' }); } catch {}
       }
     });
   };
