@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { useToast } from '@/hooks/use-toast';
 import { exportChartsAsImages } from '@/utils/chartExporter';
+import { saveAs } from 'file-saver';
 
 interface ReportData {
   query: string;
@@ -932,20 +933,12 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
         
         // Cria URL e abre em nova aba via link (sem navegar a SPA)
         pdf.getBlob((blob: Blob) => {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.target = '_blank';
-          a.rel = 'noopener';
-          a.download = fileName;
-          a.style.display = 'none';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-
-          setIsGeneratingPdf(false);
-          toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
-          setTimeout(() => URL.revokeObjectURL(url), 60000);
+          try {
+            saveAs(blob, fileName);
+          } finally {
+            setIsGeneratingPdf(false);
+            toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
+          }
         });
 
       } catch (error) {
