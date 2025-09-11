@@ -156,12 +156,14 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
         throw new Error('Elemento do relatório não encontrado');
       }
 
-      // Dimensões A4 e largura alvo em pixels equivalente ao conteúdo (margens inclusas)
-      const A4 = { widthMM: 210, heightMM: 297, marginMM: 15 };
-      const contentWidthMM = A4.widthMM - A4.marginMM * 2; // 180mm
-      const contentHeightMM = A4.heightMM - A4.marginMM * 2; // 267mm
-      const cloneWidthPx = 680; // ~180mm @ 96DPI
-      const scale = 2; // qualidade alta sem gerar arquivo gigante
+      // A4 real com margens menores para texto maior
+      const A4 = { widthMM: 210, heightMM: 297, marginMM: 10 };
+      const contentWidthMM = A4.widthMM - A4.marginMM * 2; // 190mm
+      const contentHeightMM = A4.heightMM - A4.marginMM * 2; // 277mm
+
+      // Largura alvo do clone (~190mm em 96DPI)
+      const cloneWidthPx = 720;
+      const scale = 2; // alta qualidade
 
       const canvas = await html2canvas(reportElement, {
         scale,
@@ -171,6 +173,20 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
         logging: false,
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.querySelector('[data-report-content]') as HTMLElement;
+          // CSS global no clone para evitar faixas/gradientes e garantir tipografia legível
+          const style = clonedDoc.createElement('style');
+          style.textContent = `
+            [data-report-content], [data-report-content] * { 
+              background: #ffffff !important; 
+              box-shadow: none !important; 
+              filter: none !important; 
+              text-rendering: optimizeLegibility; 
+              -webkit-font-smoothing: antialiased;
+              -moz-osx-font-smoothing: grayscale;
+            }
+          `;
+          clonedDoc.head.appendChild(style);
+
           if (clonedElement) {
             Object.assign(clonedElement.style, {
               transform: 'none',
@@ -179,8 +195,8 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
               overflow: 'visible',
               backgroundColor: '#ffffff',
               fontFamily: 'Arial, sans-serif',
-              fontSize: '14px',
-              lineHeight: '1.6',
+              fontSize: '16px',
+              lineHeight: '1.65',
               padding: '24px',
               boxSizing: 'border-box',
               width: `${cloneWidthPx}px`,
@@ -194,31 +210,40 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
-        compress: true
+        compress: true,
       });
 
       const xPos = A4.marginMM;
       const yPos = A4.marginMM;
 
-      // mm por pixel com base na largura preparada do clone (canvas.width já inclui o scale)
-      const mmPerPx = contentWidthMM / canvas.width;
+      // mm por pixel baseado na largura alvo (cloneWidthPx) e no scale
+      const mmPerPx = contentWidthMM / (cloneWidthPx * scale);
       const contentHeightPx = Math.floor(contentHeightMM / mmPerPx);
 
       const totalPages = Math.ceil(canvas.height / contentHeightPx);
+      const overlap = 2; // sobreposição para esconder costuras
 
       for (let page = 0; page < totalPages; page++) {
         if (page > 0) pdf.addPage();
 
-        // Criar fatia da página sem subpixels para evitar faixas
         const sliceCanvas = document.createElement('canvas');
         const sliceCtx = sliceCanvas.getContext('2d')!;
         sliceCanvas.width = canvas.width;
-        const sliceHeightPx = Math.min(contentHeightPx, canvas.height - page * contentHeightPx);
+
+        const startY = Math.max(0, page * contentHeightPx - (page > 0 ? overlap : 0));
+        const sliceHeightPx = Math.min(
+          contentHeightPx + (page > 0 ? overlap : 0),
+          canvas.height - startY
+        );
         sliceCanvas.height = sliceHeightPx;
+
+        // minimizar banding nas fatias
+        sliceCtx.imageSmoothingEnabled = false;
+        sliceCtx.imageSmoothingQuality = 'high';
 
         sliceCtx.drawImage(
           canvas,
-          0, page * contentHeightPx,
+          0, startY,
           canvas.width, sliceHeightPx,
           0, 0,
           canvas.width, sliceHeightPx
@@ -227,22 +252,22 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
         const imgData = sliceCanvas.toDataURL('image/png', 0.95);
         const sliceHeightMM = sliceCanvas.height * mmPerPx;
 
-        pdf.addImage(imgData, 'PNG', xPos, yPos, contentWidthMM, sliceHeightMM, undefined, 'MEDIUM');
+        pdf.addImage(imgData, 'PNG', xPos, yPos, contentWidthMM, sliceHeightMM, undefined, 'FAST');
       }
 
       const fileName = `Relatorio_${panelData.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
       pdf.save(fileName);
 
       toast({
-        title: "PDF Gerado com Sucesso!",
-        description: "Seu relatório foi baixado em alta qualidade.",
+        title: 'PDF Gerado com Sucesso!',
+        description: 'Seu relatório foi baixado em alta qualidade.',
       });
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
       toast({
-        title: "Erro",
-        description: "Não foi possível gerar o PDF. Tente novamente.",
-        variant: "destructive",
+        title: 'Erro',
+        description: 'Não foi possível gerar o PDF. Tente novamente.',
+        variant: 'destructive',
       });
     } finally {
       setIsDownloading(false);
