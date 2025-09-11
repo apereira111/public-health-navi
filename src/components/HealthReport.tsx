@@ -854,6 +854,12 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
     // Use requestAnimationFrame to ensure UI updates before heavy processing
     requestAnimationFrame(async () => {
       try {
+        // Abre uma aba em branco imediatamente (sincrono ao clique) para não bloquear a SPA
+        const previewWin = window.open('', '_blank', 'noopener,noreferrer');
+        if (previewWin) {
+          previewWin.document.write("<html><head><title>Gerando PDF...</title></head><body style='font-family:sans-serif;padding:16px;color:#111'>Gerando PDF, aguarde...</body></html>");
+        }
+        
         // Export charts as images first
         const chartImages = await exportChartsAsImages();
 
