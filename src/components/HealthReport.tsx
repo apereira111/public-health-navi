@@ -930,14 +930,24 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
         const pdf = pdfMakeLocal.createPdf(docDefinition);
         const fileName = `relatorio-saude-${Date.now()}.pdf`;
         
-        // Use direct download to avoid UI blocking
-        pdf.download(fileName);
-        
-        // Reset state and show success after a short delay
-        setTimeout(() => {
+        // Abra em nova aba para evitar navegação da SPA; fallback para download seguro
+        pdf.getBlob((blob: Blob) => {
+          const url = URL.createObjectURL(blob);
+          const newWin = window.open(url, '_blank', 'noopener,noreferrer');
+          if (!newWin) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.rel = 'noopener';
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          }
           setIsGeneratingPdf(false);
           toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
-        }, 1500);
+          setTimeout(() => URL.revokeObjectURL(url), 60000);
+        });
 
       } catch (error) {
         console.error('Erro ao gerar PDF:', error);
