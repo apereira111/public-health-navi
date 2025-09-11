@@ -28,15 +28,28 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     window.location.reload();
   };
 
+  handleContinue = () => {
+    // tenta limpar o estado de erro e continuar
+    this.setState({ hasError: false, error: undefined });
+  };
+
   render() {
     if (this.state.hasError) {
+      const err = this.state.error as any;
+      const message = (err && (err.message || String(err))) || "Erro desconhecido";
+      const stack = (err && err.stack) || "";
       return (
         <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6">
-          <div className="max-w-lg w-full space-y-4 text-center">
+          <div className="max-w-2xl w-full space-y-4 text-center">
             <h1 className="text-2xl font-bold">Algo deu errado</h1>
-            <p className="text-muted-foreground">Ocorreu um erro inesperado. Tente recarregar a página.</p>
+            <p className="text-muted-foreground">Ocorreu um erro inesperado. Você pode tentar continuar ou recarregar a página.</p>
             <div className="flex items-center justify-center gap-3">
+              <Button onClick={this.handleContinue} variant="outline">Tentar continuar</Button>
               <Button onClick={this.handleReload}>Recarregar</Button>
+            </div>
+            <div className="text-left mt-4 p-3 rounded border">
+              <p className="text-sm font-medium">Detalhes do erro</p>
+              <pre className="text-xs whitespace-pre-wrap text-muted-foreground mt-2">{message}{stack ? `\n${stack}` : ""}</pre>
             </div>
           </div>
         </div>

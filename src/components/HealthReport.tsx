@@ -858,8 +858,13 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
     // Use requestAnimationFrame to ensure UI updates before heavy processing
     requestAnimationFrame(async () => {
       try {
-        // Export charts como imagens primeiro (não abre/edita nenhuma janela para evitar sobrescrever a SPA)
-        const chartImages = await exportChartsAsImages();
+        let chartImages: any[] = [];
+        try {
+          chartImages = await exportChartsAsImages();
+        } catch (e) {
+          console.error('HealthReport:exportChartsAsImages:error', e);
+          chartImages = [];
+        }
 
         const pdfMakeMod = await import('pdfmake/build/pdfmake');
         const pdfFontsMod = await import('pdfmake/build/vfs_fonts');

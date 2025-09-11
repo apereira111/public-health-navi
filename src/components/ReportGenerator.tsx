@@ -210,17 +210,22 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
 
       saveAs(blob, fileName);
 
-      toast({
-        title: 'PDF Gerado com Sucesso!',
-        description: 'Seu relatório foi baixado em alta qualidade.',
-      });
+      try {
+        toast({
+          title: 'PDF Gerado com Sucesso!',
+          description: 'Seu relatório foi baixado em alta qualidade.',
+        });
+      } catch {}
+
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
-      toast({
-        title: 'Erro',
-        description: 'Não foi possível gerar o PDF. Tente novamente.',
-        variant: 'destructive',
-      });
+      try {
+        toast({
+          title: 'Erro',
+          description: 'Não foi possível gerar o PDF. Tente novamente.',
+          variant: 'destructive',
+        });
+      } catch {}
     } finally {
       setIsDownloading(false);
     }
