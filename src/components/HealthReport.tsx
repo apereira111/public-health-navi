@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
@@ -178,6 +178,7 @@ const generateGenericAnalysis = (panelType: string): AnalysisResult => {
 
 export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => {
   const { toast } = useToast();
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const generateChartData = (query: string) => {
     const lowercaseQuery = query.toLowerCase();
@@ -845,8 +846,11 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
   };
 
   const generatePDF = async () => {
+    if (isGeneratingPdf) return;
+    
     try {
-      toast({ title: 'Gerando PDF...', description: 'Processando gráficos e conteúdo. Aguarde...' });
+      setIsGeneratingPdf(true);
+      toast({ title: 'Gerando PDF...', description: 'Processando gráficos e conteúdo. Aguarde alguns segundos...' });
 
       // Export charts as images first
       const chartImages = await exportChartsAsImages();
@@ -923,28 +927,26 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
 
       const pdf = pdfMakeLocal.createPdf(docDefinition);
       
-      // Try to open in new tab first, fallback to download
-      try {
+      // Use setTimeout to prevent UI blocking and ensure non-blocking behavior
+      setTimeout(() => {
         pdf.getDataUrl((dataUrl: string) => {
-          const newWindow = window.open();
-          if (newWindow) {
-            newWindow.document.write(`
-              <iframe width='100%' height='100%' src='${dataUrl}'></iframe>
-            `);
-          } else {
-            // Fallback to download if popup is blocked
-            pdf.download(`relatorio-saude-${Date.now()}.pdf`);
-          }
+          // Create a temporary link and trigger download without affecting the current page
+          const link = document.createElement('a');
+          link.href = dataUrl;
+          link.download = `relatorio-saude-${Date.now()}.pdf`;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
         });
-      } catch (error) {
-        // Final fallback to direct download
-        pdf.download(`relatorio-saude-${Date.now()}.pdf`);
-      }
+      }, 100);
 
       toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
       toast({ title: 'Erro', description: 'Erro ao gerar o PDF. Tente novamente.', variant: 'destructive' });
+    } finally {
+      setIsGeneratingPdf(false);
     }
   };
 
@@ -958,8 +960,22 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Relatório de Saúde</h2>
             <div className="flex gap-2">
-              <Button onClick={generatePDF} variant="outline">
-                📄 Exportar PDF
+              <Button 
+                onClick={generatePDF} 
+                variant="outline"
+                disabled={isGeneratingPdf}
+                className={isGeneratingPdf ? "bg-blue-100 text-blue-700 border-blue-300" : ""}
+              >
+                {isGeneratingPdf ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                    Gerando PDF...
+                  </>
+                ) : (
+                  <>
+                    📄 Exportar PDF
+                  </>
+                )}
               </Button>
               <Button onClick={onClose} variant="outline">
                 ✕ Fechar
