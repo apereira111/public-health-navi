@@ -169,6 +169,7 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
         scale,
         useCORS: true,
         allowTaint: false,
+        foreignObjectRendering: true,
         backgroundColor: '#ffffff',
         logging: false,
         onclone: (clonedDoc) => {
@@ -217,7 +218,7 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
       const yPos = A4.marginMM;
 
       // mm por pixel baseado na largura alvo (cloneWidthPx) e no scale
-      const mmPerPx = contentWidthMM / (cloneWidthPx * scale);
+      const mmPerPx = contentWidthMM / canvas.width;
       const contentHeightPx = Math.floor(contentHeightMM / mmPerPx);
 
       const totalPages = Math.ceil(canvas.height / contentHeightPx);
@@ -252,7 +253,7 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
         const imgData = sliceCanvas.toDataURL('image/png', 0.95);
         const sliceHeightMM = sliceCanvas.height * mmPerPx;
 
-        pdf.addImage(imgData, 'PNG', xPos, yPos, contentWidthMM, sliceHeightMM, undefined, 'FAST');
+        pdf.addImage(imgData, 'PNG', xPos, yPos, contentWidthMM, sliceHeightMM, undefined, 'MEDIUM');
       }
 
       const fileName = `Relatorio_${panelData.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
