@@ -7,10 +7,8 @@ import { FileText, Download, TrendingUp, TrendingDown, Calendar, BarChart3, Save
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import type { PanelData } from "@/types";
-import { createPrintableReport } from "@/utils/createPrintableReport";
 
 interface ReportGeneratorProps {
   panelData: PanelData;
@@ -152,94 +150,66 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
     setIsDownloading(true);
 
     try {
-      // Dimensões A4 e largura alvo calculada
-      const A4 = { widthMM: 210, heightMM: 297, marginMM: 0 };
-      const contentWidthMM = A4.widthMM; // largura total
-      const contentHeightMM = A4.heightMM; // altura total
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 15;
+      const contentWidth = pageWidth - margin * 2;
+      let y = margin;
 
-      const cloneWidthPx = Math.round((contentWidthMM / 25.4) * 96); // px @96DPI
-      const scale = 3; // resolução alta para impressão nítida
+      const addText = (text: string, fontSize = 12, bold = false) => {
+        pdf.setFont('helvetica', bold ? 'bold' : 'normal');
+        pdf.setFontSize(fontSize);
+        const lines = pdf.splitTextToSize(text, contentWidth);
+        const lineHeight = Math.max(4.8, fontSize * 0.45);
+        for (const line of lines) {
+          if (y + lineHeight > pageHeight - margin) {
+            pdf.addPage();
+            y = margin;
+          }
+          pdf.text(line, margin, y);
+          y += lineHeight;
+        }
+      };
 
-      // Monta um template limpo, fora do diálogo/portais para evitar transform/banding
-      const printableEl = createPrintableReport(panelData, {
-        date: currentDate,
-        executiveSummary: generateExecutiveSummary(),
-        insights: generateInsights(),
-        recommendations: generateRecommendations(),
-        widthPx: cloneWidthPx,
-        baseFontPx: 18,
-      });
-      document.body.appendChild(printableEl);
+      const addHeading = (text: string, level: 1 | 2 = 2) => {
+        const size = level === 1 ? 18 : 14;
+        addText(text, size, true);
+        y += level === 1 ? 2 : 1.5;
+      };
 
-      const canvas = await html2canvas(printableEl, {
-        scale,
-        useCORS: true,
-        allowTaint: false,
-        foreignObjectRendering: true,
-        backgroundColor: '#ffffff',
-        logging: false,
-      });
+      const addList = (items: string[], fontSize = 12) => {
+        for (const item of items) {
+          addText(`• ${item}`, fontSize);
+        }
+      };
 
-      // Remover o elemento temporário após a captura
-      document.body.removeChild(printableEl);
+      // Cabeçalho
+      addHeading(`Relatório Executivo - ${panelData.title}`, 1);
+      addText(`Data: ${currentDate}`, 11);
+      y += 2;
 
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-        compress: true,
-      });
+      // Resumo Executivo
+      addHeading('Resumo Executivo');
+      addText(generateExecutiveSummary(), 12);
+      y += 2;
 
-      const xPos = A4.marginMM;
-      const yPos = A4.marginMM;
+      // Indicadores Principais
+      addHeading('Indicadores Principais');
+      const kpiLines = panelData.kpis.map(
+        (kpi) => `${kpi.title}: ${kpi.value} — ${kpi.change} ${kpi.changeType === 'increase' ? '(↑)' : '(↓)'}`
+      );
+      addList(kpiLines, 12);
+      y += 2;
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      console.log('[PDF DEBUG] page(mm)', { pdfWidth, pdfHeight });
+      // Insights e Análises
+      addHeading('Insights e Análises');
+      addList(generateInsights(), 12);
+      y += 2;
 
-      // mm por pixel baseado na largura real do canvas e largura útil do PDF
-      const mmPerPx = contentWidthMM / canvas.width;
-      const contentHeightPx = Math.floor(contentHeightMM / mmPerPx);
-
-      console.log('[PDF DEBUG] canvas(px)', { w: canvas.width, h: canvas.height, mmPerPx, contentWidthMM, contentHeightMM, contentHeightPx });
-
-      const totalPages = Math.ceil(canvas.height / contentHeightPx);
-      const overlap = 2; // sobreposição para esconder costuras
-
-      for (let page = 0; page < totalPages; page++) {
-        if (page > 0) pdf.addPage();
-
-        const sliceCanvas = document.createElement('canvas');
-        const sliceCtx = sliceCanvas.getContext('2d')!;
-        sliceCanvas.width = canvas.width;
-
-        const startY = Math.max(0, page * contentHeightPx - (page > 0 ? overlap : 0));
-        const sliceHeightPx = Math.min(
-          contentHeightPx + (page > 0 ? overlap : 0),
-          canvas.height - startY
-        );
-        sliceCanvas.height = sliceHeightPx;
-
-        // preparar fundo branco para evitar transparência e listras
-        sliceCtx.fillStyle = '#ffffff';
-        sliceCtx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-
-        sliceCtx.imageSmoothingEnabled = true;
-        sliceCtx.imageSmoothingQuality = 'high';
-
-        sliceCtx.drawImage(
-          canvas,
-          0, startY,
-          canvas.width, sliceHeightPx,
-          0, 0,
-          canvas.width, sliceHeightPx
-        );
-
-        const imgData = sliceCanvas.toDataURL('image/png', 1.0);
-        const sliceHeightMM = sliceCanvas.height * mmPerPx;
-
-        pdf.addImage(imgData, 'PNG', xPos, yPos, contentWidthMM, sliceHeightMM, undefined, 'MEDIUM');
-      }
+      // Recomendações
+      addHeading('Recomendações');
+      addList(generateRecommendations(), 12);
 
       const fileName = `Relatorio_${panelData.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
       pdf.save(fileName);
