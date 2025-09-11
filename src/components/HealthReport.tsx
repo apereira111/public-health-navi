@@ -848,102 +848,103 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
   const generatePDF = async () => {
     if (isGeneratingPdf) return;
     
-    try {
-      setIsGeneratingPdf(true);
-      toast({ title: 'Gerando PDF...', description: 'Processando gráficos e conteúdo. Aguarde alguns segundos...' });
+    setIsGeneratingPdf(true);
+    toast({ title: 'Gerando PDF...', description: 'Processando gráficos e conteúdo. Aguarde alguns segundos...' });
 
-      // Export charts as images first
-      const chartImages = await exportChartsAsImages();
+    // Use requestAnimationFrame to ensure UI updates before heavy processing
+    requestAnimationFrame(async () => {
+      try {
+        // Export charts as images first
+        const chartImages = await exportChartsAsImages();
 
-      const pdfMakeMod = await import('pdfmake/build/pdfmake');
-      const pdfFontsMod = await import('pdfmake/build/vfs_fonts');
-      const pdfMakeLocal: any = (pdfMakeMod as any).default ?? (pdfMakeMod as any);
-      const vfs = (pdfFontsMod as any).vfs ?? (pdfFontsMod as any).pdfMake?.vfs;
-      if (vfs) pdfMakeLocal.vfs = vfs;
+        const pdfMakeMod = await import('pdfmake/build/pdfmake');
+        const pdfFontsMod = await import('pdfmake/build/vfs_fonts');
+        const pdfMakeLocal: any = (pdfMakeMod as any).default ?? (pdfMakeMod as any);
+        const vfs = (pdfFontsMod as any).vfs ?? (pdfFontsMod as any).pdfMake?.vfs;
+        if (vfs) pdfMakeLocal.vfs = vfs;
 
-      const bulletsFromMultiline = (text: string) => text.split('\n').map(s => s.trim()).filter(Boolean);
+        const bulletsFromMultiline = (text: string) => text.split('\n').map(s => s.trim()).filter(Boolean);
 
-      const chartContent = chartImages.length > 0 ? [
-        { text: 'Gráficos e Visualizações', style: 'subheader' },
-        ...chartImages.flatMap((chart) => [
-          { text: chart.title, style: 'sectionTitle' },
-          { 
-            image: chart.dataUrl, 
-            width: 500, 
-            margin: [0, 5, 0, 15],
-            alignment: 'center'
-          }
-        ])
-      ] : [];
+        const chartContent = chartImages.length > 0 ? [
+          { text: 'Gráficos e Visualizações', style: 'subheader' },
+          ...chartImages.flatMap((chart) => [
+            { text: chart.title, style: 'sectionTitle' },
+            { 
+              image: chart.dataUrl, 
+              width: 500, 
+              margin: [0, 5, 0, 15],
+              alignment: 'center'
+            }
+          ])
+        ] : [];
 
-      const docDefinition: any = {
-        pageSize: 'A4',
-        pageMargins: [20, 24, 20, 28],
-        content: [
-          { text: 'Relatório de Indicadores de Saúde', style: 'header' },
-          { text: `Consulta: "${data.query}"`, style: 'meta' },
-          { text: `Gerado em: ${new Date(data.timestamp).toLocaleString('pt-BR')}`, style: 'meta', margin: [0, 0, 0, 8] },
+        const docDefinition: any = {
+          pageSize: 'A4',
+          pageMargins: [20, 24, 20, 28],
+          content: [
+            { text: 'Relatório de Indicadores de Saúde', style: 'header' },
+            { text: `Consulta: "${data.query}"`, style: 'meta' },
+            { text: `Gerado em: ${new Date(data.timestamp).toLocaleString('pt-BR')}`, style: 'meta', margin: [0, 0, 0, 8] },
 
-          { text: 'Resumo Executivo', style: 'subheader' },
-          ...(analysis.executiveSummary ? [{ text: analysis.executiveSummary, style: 'normal', margin: [0, 0, 0, 10] }] : []),
-          ...(data.results?.length ? [{ ul: data.results, style: 'normal', margin: [0, 0, 0, 12] }] : []),
+            { text: 'Resumo Executivo', style: 'subheader' },
+            ...(analysis.executiveSummary ? [{ text: analysis.executiveSummary, style: 'normal', margin: [0, 0, 0, 10] }] : []),
+            ...(data.results?.length ? [{ ul: data.results, style: 'normal', margin: [0, 0, 0, 12] }] : []),
 
-          ...chartContent,
+            ...chartContent,
 
-          { text: 'Seções Analíticas', style: 'subheader' },
-          ...analysis.sections.flatMap((sec) => [
-            { text: sec.title, style: 'sectionTitle' },
-            { text: sec.content, style: 'normal', margin: [0, 0, 0, 8] },
-          ]),
+            { text: 'Seções Analíticas', style: 'subheader' },
+            ...analysis.sections.flatMap((sec) => [
+              { text: sec.title, style: 'sectionTitle' },
+              { text: sec.content, style: 'normal', margin: [0, 0, 0, 8] },
+            ]),
 
-          ...(analysis.recommendations?.length ? [
-            { text: 'Recomendações Prioritárias', style: 'subheader' },
-            { ul: analysis.recommendations.map(r => `${r.priority}: ${r.action} — Prazo: ${r.timeline} — Investimento: ${r.investment} — Responsável: ${r.responsible} — Impacto: ${r.expectedImpact}`), style: 'normal', margin: [0, 0, 0, 12] },
-          ] : []),
+            ...(analysis.recommendations?.length ? [
+              { text: 'Recomendações Prioritárias', style: 'subheader' },
+              { ul: analysis.recommendations.map(r => `${r.priority}: ${r.action} — Prazo: ${r.timeline} — Investimento: ${r.investment} — Responsável: ${r.responsible} — Impacto: ${r.expectedImpact}`), style: 'normal', margin: [0, 0, 0, 12] },
+            ] : []),
 
-          { text: definitions.title, style: 'subheader' },
-          { ul: bulletsFromMultiline(definitions.content), style: 'normal', margin: [0, 0, 0, 12] },
+            { text: definitions.title, style: 'subheader' },
+            { ul: bulletsFromMultiline(definitions.content), style: 'normal', margin: [0, 0, 0, 12] },
 
-          { text: 'Conclusões', style: 'subheader' },
-          { ul: [
-            `Pontos Positivos: ${conclusions.positive}`,
-            `Desafios: ${conclusions.challenges}`,
-            `Próximos Passos: ${conclusions.nextSteps}`,
-          ], style: 'normal' },
-        ],
-        styles: {
-          header: { fontSize: 22, bold: true, margin: [0, 0, 0, 8] },
-          subheader: { fontSize: 16, bold: true, color: '#111', margin: [0, 10, 0, 6] },
-          sectionTitle: { fontSize: 14, bold: true, margin: [0, 6, 0, 4] },
-          normal: { fontSize: 13.5, lineHeight: 1.45, color: '#000' },
-          meta: { fontSize: 10.5, color: '#555' },
-        },
-        defaultStyle: { font: 'Roboto' },
-        footer: (currentPage: number, pageCount: number) => ({
-          text: `Página ${currentPage} de ${pageCount}`,
-          alignment: 'right', margin: [0, 8, 20, 0], fontSize: 9, color: '#666'
-        }),
-      };
+            { text: 'Conclusões', style: 'subheader' },
+            { ul: [
+              `Pontos Positivos: ${conclusions.positive}`,
+              `Desafios: ${conclusions.challenges}`,
+              `Próximos Passos: ${conclusions.nextSteps}`,
+            ], style: 'normal' },
+          ],
+          styles: {
+            header: { fontSize: 22, bold: true, margin: [0, 0, 0, 8] },
+            subheader: { fontSize: 16, bold: true, color: '#111', margin: [0, 10, 0, 6] },
+            sectionTitle: { fontSize: 14, bold: true, margin: [0, 6, 0, 4] },
+            normal: { fontSize: 13.5, lineHeight: 1.45, color: '#000' },
+            meta: { fontSize: 10.5, color: '#555' },
+          },
+          defaultStyle: { font: 'Roboto' },
+          footer: (currentPage: number, pageCount: number) => ({
+            text: `Página ${currentPage} de ${pageCount}`,
+            alignment: 'right', margin: [0, 8, 20, 0], fontSize: 9, color: '#666'
+          }),
+        };
 
-      const pdf = pdfMakeLocal.createPdf(docDefinition);
-      
-      // Create download with proper state management
-      const fileName = `relatorio-saude-${Date.now()}.pdf`;
-      
-      // Use direct download to avoid UI blocking
-      pdf.download(fileName);
-      
-      // Reset state and show success after a short delay
-      setTimeout(() => {
+        const pdf = pdfMakeLocal.createPdf(docDefinition);
+        const fileName = `relatorio-saude-${Date.now()}.pdf`;
+        
+        // Use direct download to avoid UI blocking
+        pdf.download(fileName);
+        
+        // Reset state and show success after a short delay
+        setTimeout(() => {
+          setIsGeneratingPdf(false);
+          toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
+        }, 1500);
+
+      } catch (error) {
+        console.error('Erro ao gerar PDF:', error);
         setIsGeneratingPdf(false);
-        toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
-      }, 1500);
-
-    } catch (error) {
-      console.error('Erro ao gerar PDF:', error);
-      setIsGeneratingPdf(false);
-      toast({ title: 'Erro', description: 'Erro ao gerar o PDF. Tente novamente.', variant: 'destructive' });
-    }
+        toast({ title: 'Erro', description: 'Erro ao gerar o PDF. Tente novamente.', variant: 'destructive' });
+      }
+    });
   };
 
   const definitions = generateDefinitions(data.query);
