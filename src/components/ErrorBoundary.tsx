@@ -8,6 +8,7 @@ interface ErrorBoundaryProps {
 interface ErrorBoundaryState {
   hasError: boolean;
   error?: unknown;
+  info?: React.ErrorInfo;
 }
 
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
@@ -20,8 +21,9 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: unknown, info: unknown) {
+  componentDidCatch(error: unknown, info: React.ErrorInfo) {
     console.error("Global ErrorBoundary caught an error:", error, info);
+    this.setState({ info });
   }
 
   handleReload = () => {
@@ -55,7 +57,11 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
             </div>
             <div className="text-left mt-4 p-3 rounded border">
               <p className="text-sm font-medium">Detalhes do erro</p>
-              <pre className="text-xs whitespace-pre-wrap text-muted-foreground mt-2">{message}{stack ? `\n${stack}` : ""}</pre>
+              <pre className="text-xs whitespace-pre-wrap text-muted-foreground mt-2">
+                {message}
+                {stack ? `\n${stack}` : ""}
+                {this.state.info?.componentStack ? `\nComponent stack:\n${this.state.info.componentStack}` : ""}
+              </pre>
             </div>
           </div>
         </div>

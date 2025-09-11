@@ -159,6 +159,13 @@ function toast({ ...props }: Toast) {
     title: props.title ? sanitizeToastValue(props.title) : undefined,
     description: props.description ? sanitizeToastValue(props.description) : undefined,
   };
+  try {
+    console.debug("[toast] create", {
+      variant: (sanitizedProps as any).variant,
+      titleType: typeof sanitizedProps.title,
+      descriptionType: typeof sanitizedProps.description,
+    });
+  } catch {}
 
   const safeAction = props.action && React.isValidElement(props.action) ? props.action : undefined;
 
