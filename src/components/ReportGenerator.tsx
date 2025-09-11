@@ -7,11 +7,7 @@ import { FileText, Download, TrendingUp, TrendingDown, Calendar, BarChart3, Save
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import jsPDF from "jspdf";
 import type { PanelData } from "@/types";
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
-(pdfMake as any).vfs = (pdfFonts as any).pdfMake.vfs;
 
 interface ReportGeneratorProps {
   panelData: PanelData;
@@ -193,7 +189,14 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
       };
 
       const fileName = `Relatorio_${panelData.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
-      (pdfMake as any).createPdf(docDefinition).download(fileName);
+
+      const pdfMakeMod = await import('pdfmake/build/pdfmake');
+      const pdfFontsMod = await import('pdfmake/build/vfs_fonts');
+      const pdfMakeLocal: any = (pdfMakeMod as any).default ?? (pdfMakeMod as any);
+      const vfs = (pdfFontsMod as any).vfs ?? (pdfFontsMod as any).pdfMake?.vfs;
+      if (vfs) pdfMakeLocal.vfs = vfs;
+
+      pdfMakeLocal.createPdf(docDefinition).download(fileName);
 
       toast({
         title: 'PDF Gerado com Sucesso!',
