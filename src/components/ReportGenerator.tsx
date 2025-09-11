@@ -9,6 +9,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import jsPDF from "jspdf";
 import type { PanelData } from "@/types";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+(pdfMake as any).vfs = (pdfFonts as any).pdfMake.vfs;
 
 interface ReportGeneratorProps {
   panelData: PanelData;
@@ -150,69 +153,47 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
     setIsDownloading(true);
 
     try {
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 15;
-      const contentWidth = pageWidth - margin * 2;
-      let y = margin;
+      const executiveSummary = generateExecutiveSummary();
+      const insights = generateInsights();
+      const recommendations = generateRecommendations();
 
-      const addText = (text: string, fontSize = 12, bold = false) => {
-        pdf.setFont('helvetica', bold ? 'bold' : 'normal');
-        pdf.setFontSize(fontSize);
-        const lines = pdf.splitTextToSize(text, contentWidth);
-        const lineHeight = Math.max(4.8, fontSize * 0.45);
-        for (const line of lines) {
-          if (y + lineHeight > pageHeight - margin) {
-            pdf.addPage();
-            y = margin;
-          }
-          pdf.text(line, margin, y);
-          y += lineHeight;
-        }
+      const docDefinition: any = {
+        pageSize: 'A4',
+        pageMargins: [20, 24, 20, 28],
+        content: [
+          { text: `Relatório Executivo - ${panelData.title}`, style: 'header' },
+          { text: `${currentDate}`, style: 'meta', margin: [0, 0, 0, 8] },
+          { text: `${panelData.description}`, style: 'normal', margin: [0, 0, 0, 12] },
+
+          { text: 'Resumo Executivo', style: 'subheader' },
+          { text: `${executiveSummary}`, style: 'normal', margin: [0, 0, 0, 12] },
+
+          { text: 'Indicadores Principais', style: 'subheader' },
+          { ul: panelData.kpis.map(kpi => `${kpi.title}: ${kpi.value} — ${kpi.change} ${kpi.changeType === 'increase' ? '(↑)' : '(↓)'}`), style: 'normal', margin: [0, 0, 0, 12] },
+
+          { text: 'Insights e Análises', style: 'subheader' },
+          { ul: insights, style: 'normal', margin: [0, 0, 0, 12] },
+
+          { text: 'Recomendações', style: 'subheader' },
+          { ul: recommendations, style: 'normal' },
+        ],
+        styles: {
+          header: { fontSize: 20, bold: true, margin: [0, 0, 0, 8] },
+          subheader: { fontSize: 15, bold: true, color: '#111', margin: [0, 10, 0, 6] },
+          normal: { fontSize: 12, lineHeight: 1.4, color: '#000' },
+          meta: { fontSize: 10, color: '#555' },
+        },
+        defaultStyle: {
+          font: 'Roboto',
+        },
+        footer: (currentPage: number, pageCount: number) => ({
+          text: `Página ${currentPage} de ${pageCount}`,
+          alignment: 'right', margin: [0, 8, 20, 0], fontSize: 9, color: '#666'
+        }),
       };
-
-      const addHeading = (text: string, level: 1 | 2 = 2) => {
-        const size = level === 1 ? 18 : 14;
-        addText(text, size, true);
-        y += level === 1 ? 2 : 1.5;
-      };
-
-      const addList = (items: string[], fontSize = 12) => {
-        for (const item of items) {
-          addText(`• ${item}`, fontSize);
-        }
-      };
-
-      // Cabeçalho
-      addHeading(`Relatório Executivo - ${panelData.title}`, 1);
-      addText(`Data: ${currentDate}`, 11);
-      y += 2;
-
-      // Resumo Executivo
-      addHeading('Resumo Executivo');
-      addText(generateExecutiveSummary(), 12);
-      y += 2;
-
-      // Indicadores Principais
-      addHeading('Indicadores Principais');
-      const kpiLines = panelData.kpis.map(
-        (kpi) => `${kpi.title}: ${kpi.value} — ${kpi.change} ${kpi.changeType === 'increase' ? '(↑)' : '(↓)'}`
-      );
-      addList(kpiLines, 12);
-      y += 2;
-
-      // Insights e Análises
-      addHeading('Insights e Análises');
-      addList(generateInsights(), 12);
-      y += 2;
-
-      // Recomendações
-      addHeading('Recomendações');
-      addList(generateRecommendations(), 12);
 
       const fileName = `Relatorio_${panelData.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
-      pdf.save(fileName);
+      (pdfMake as any).createPdf(docDefinition).download(fileName);
 
       toast({
         title: 'PDF Gerado com Sucesso!',
