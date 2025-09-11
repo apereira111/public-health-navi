@@ -157,47 +157,91 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
         throw new Error('Elemento do relatório não encontrado');
       }
 
-      // Configurar html2canvas para melhor qualidade
+      // Configurar html2canvas com configurações otimizadas
       const canvas = await html2canvas(reportElement, {
-        scale: 2, // Aumenta a resolução
+        scale: 3, // Alta resolução
         useCORS: true,
         allowTaint: false,
         backgroundColor: '#ffffff',
-        width: reportElement.scrollWidth,
-        height: reportElement.scrollHeight,
-        scrollX: 0,
-        scrollY: 0
+        logging: false,
+        onclone: (clonedDoc) => {
+          // Aplicar estilos no documento clonado para melhor renderização
+          const clonedElement = clonedDoc.querySelector('[data-report-content]') as HTMLElement;
+          if (clonedElement) {
+            clonedElement.style.width = '794px'; // Largura A4 em pixels (210mm)
+            clonedElement.style.padding = '40px';
+            clonedElement.style.boxSizing = 'border-box';
+            clonedElement.style.backgroundColor = '#ffffff';
+          }
+        }
       });
 
       // Configurar o PDF
       const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10; // margem de 10mm
+      
+      // Converter canvas para image data com alta qualidade
       const imgData = canvas.toDataURL('image/png', 1.0);
       
-      // Calcular dimensões para ajustar ao PDF
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
+      // Calcular dimensões mantendo proporção
+      const availableWidth = pageWidth - (2 * margin);
+      const availableHeight = pageHeight - (2 * margin);
       
-      // Calcular proporção para manter aspecto
-      const ratio = Math.min(pdfWidth / (imgWidth * 0.264583), pdfHeight / (imgHeight * 0.264583));
+      const canvasAspectRatio = canvas.height / canvas.width;
       
-      const scaledWidth = (imgWidth * 0.264583) * ratio;
-      const scaledHeight = (imgHeight * 0.264583) * ratio;
+      let finalWidth = availableWidth;
+      let finalHeight = finalWidth * canvasAspectRatio;
       
-      // Centralizar a imagem no PDF
-      const xPos = (pdfWidth - scaledWidth) / 2;
-      const yPos = (pdfHeight - scaledHeight) / 2;
-
-      pdf.addImage(imgData, 'PNG', xPos, yPos, scaledWidth, scaledHeight);
+      // Se a altura exceder a página, ajustar pela altura
+      if (finalHeight > availableHeight) {
+        finalHeight = availableHeight;
+        finalWidth = finalHeight / canvasAspectRatio;
+      }
+      
+      // Se ainda assim não couber, dividir em múltiplas páginas
+      if (finalHeight > availableHeight) {
+        // Calcular quantas páginas são necessárias
+        const pagesNeeded = Math.ceil(finalHeight / availableHeight);
+        const pageSliceHeight = canvas.height / pagesNeeded;
+        
+        for (let page = 0; page < pagesNeeded; page++) {
+          if (page > 0) pdf.addPage();
+          
+          // Criar canvas para cada pedaço da página
+          const pageCanvas = document.createElement('canvas');
+          const pageCtx = pageCanvas.getContext('2d')!;
+          pageCanvas.width = canvas.width;
+          pageCanvas.height = pageSliceHeight;
+          
+          // Desenhar apenas a parte correspondente desta página
+          pageCtx.drawImage(
+            canvas,
+            0, page * pageSliceHeight, // origem x, y
+            canvas.width, pageSliceHeight, // largura e altura da origem
+            0, 0, // destino x, y
+            canvas.width, pageSliceHeight // largura e altura do destino
+          );
+          
+          const pageImgData = pageCanvas.toDataURL('image/png', 1.0);
+          pdf.addImage(pageImgData, 'PNG', margin, margin, availableWidth, availableHeight);
+        }
+      } else {
+        // Centralizar na página
+        const xPos = (pageWidth - finalWidth) / 2;
+        const yPos = (pageHeight - finalHeight) / 2;
+        
+        pdf.addImage(imgData, 'PNG', xPos, yPos, finalWidth, finalHeight);
+      }
       
       // Salvar o PDF
       const fileName = `Relatorio_${panelData.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
       pdf.save(fileName);
 
       toast({
-        title: "PDF Gerado!",
-        description: "Seu relatório foi baixado com sucesso.",
+        title: "PDF Gerado com Sucesso!",
+        description: "Seu relatório foi baixado em alta qualidade.",
       });
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
