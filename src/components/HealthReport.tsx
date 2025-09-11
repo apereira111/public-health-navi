@@ -850,6 +850,7 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
     if (isGeneratingPdf) return;
     
     setIsGeneratingPdf(true);
+    console.log('HealthReport:generatePDF:start');
     toast({ title: 'Gerando PDF...', description: 'Processando gráficos e conteúdo. Aguarde alguns segundos...' });
 
     // Use requestAnimationFrame to ensure UI updates before heavy processing
@@ -931,13 +932,25 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
         const pdf = pdfMakeLocal.createPdf(docDefinition);
         const fileName = `relatorio-saude-${Date.now()}.pdf`;
         
-        // Cria URL e abre em nova aba via link (sem navegar a SPA)
+        // Gera blob e salva sem navegar; fecha o modal após sucesso
         pdf.getBlob((blob: Blob) => {
           try {
             saveAs(blob, fileName);
+            console.log('HealthReport:generatePDF:saveAs:success');
+          } catch (err) {
+            console.error('HealthReport:generatePDF:saveAs:error', err);
           } finally {
             setIsGeneratingPdf(false);
             toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
+            // Fecha o modal após gerar o PDF para evitar overlay branco
+            setTimeout(() => {
+              try {
+                console.log('HealthReport:onClose:auto');
+                onClose();
+              } catch (e) {
+                console.error('HealthReport:onClose:error', e);
+              }
+            }, 0);
           }
         });
 
@@ -960,6 +973,7 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
             <h2 className="text-2xl font-bold">Relatório de Saúde</h2>
             <div className="flex gap-2">
               <Button 
+                type="button"
                 onClick={generatePDF} 
                 variant="outline"
                 disabled={isGeneratingPdf}
@@ -976,7 +990,7 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
                   </>
                 )}
               </Button>
-              <Button onClick={onClose} variant="outline">
+              <Button type="button" onClick={() => { console.log('HealthReport:onClose:click'); onClose(); }} variant="outline">
                 ✕ Fechar
               </Button>
             </div>
