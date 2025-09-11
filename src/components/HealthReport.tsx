@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { useToast } from '@/hooks/use-toast';
+import { exportChartsAsImages } from '@/utils/chartExporter';
 
 interface ReportData {
   query: string;
@@ -550,113 +551,125 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
       const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300'];
       
       return (
-        <ResponsiveContainer width="100%" height={400}>
-          <LineChart data={chart.data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="year" style={{ fontSize: '14px' }} />
-            <YAxis yAxisId="left" style={{ fontSize: '14px' }} />
-            <YAxis yAxisId="right" orientation="right" style={{ fontSize: '14px' }} />
-            <Tooltip 
-              contentStyle={{ 
-                fontSize: '14px',
-                backgroundColor: '#fff',
-                border: '1px solid #ccc',
-                borderRadius: '8px'
-              }} 
-            />
-            {dataKeys.map((key, index) => (
-              <Line 
-                key={key}
-                yAxisId={index === 0 ? "left" : "right"}
-                type="monotone" 
-                dataKey={key} 
-                stroke={colors[index % colors.length]} 
-                strokeWidth={3}
-                dot={{ r: 4 }}
-                name={key.charAt(0).toUpperCase() + key.slice(1)}
+        <div className="chart-container">
+          <h4 className="chart-title text-lg font-semibold mb-4">{chart.title}</h4>
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart data={chart.data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="year" style={{ fontSize: '14px' }} />
+              <YAxis yAxisId="left" style={{ fontSize: '14px' }} />
+              <YAxis yAxisId="right" orientation="right" style={{ fontSize: '14px' }} />
+              <Tooltip 
+                contentStyle={{ 
+                  fontSize: '14px',
+                  backgroundColor: '#fff',
+                  border: '1px solid #ccc',
+                  borderRadius: '8px'
+                }} 
               />
-            ))}
-          </LineChart>
-        </ResponsiveContainer>
+              {dataKeys.map((key, index) => (
+                <Line 
+                  key={key}
+                  yAxisId={index === 0 ? "left" : "right"}
+                  type="monotone" 
+                  dataKey={key} 
+                  stroke={colors[index % colors.length]} 
+                  strokeWidth={3}
+                  dot={{ r: 4 }}
+                  name={key.charAt(0).toUpperCase() + key.slice(1)}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       );
     }
 
     // GRÁFICO DE BARRAS (existente)
     if (chart.type === 'bar') {
       return (
-        <ResponsiveContainer width="100%" height={350}>
-          <BarChart data={chart.data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" style={{ fontSize: '14px' }} />
-            <YAxis style={{ fontSize: '14px' }} />
-            <Tooltip 
-              contentStyle={{ 
-                fontSize: '14px',
-                backgroundColor: '#fff',
-                border: '1px solid #ccc',
-                borderRadius: '8px'
-              }} 
-            />
-            <Bar dataKey="value" fill="#8884d8" />
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="chart-container">
+          <h4 className="chart-title text-lg font-semibold mb-4">{chart.title}</h4>
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart data={chart.data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" style={{ fontSize: '14px' }} />
+              <YAxis style={{ fontSize: '14px' }} />
+              <Tooltip 
+                contentStyle={{ 
+                  fontSize: '14px',
+                  backgroundColor: '#fff',
+                  border: '1px solid #ccc',
+                  borderRadius: '8px'
+                }} 
+              />
+              <Bar dataKey="value" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       );
     }
 
     // GRÁFICO DE LINHA SIMPLES (existente)
     if (chart.type === 'line') {
       return (
-        <ResponsiveContainer width="100%" height={350}>
-          <LineChart data={chart.data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey={chart.data[0].year ? "year" : "name"} style={{ fontSize: '14px' }} />
-            <YAxis style={{ fontSize: '14px' }} />
-            <Tooltip 
-              contentStyle={{ 
-                fontSize: '14px',
-                backgroundColor: '#fff',
-                border: '1px solid #ccc',
-                borderRadius: '8px'
-              }} 
-            />
-            <Line type="monotone" dataKey={chart.data[0].Brasil ? "Brasil" : "value"} stroke="#8884d8" strokeWidth={3} />
-            {chart.data[0]['Meta ODS'] && (
-              <Line type="monotone" dataKey="Meta ODS" stroke="#ff7300" strokeWidth={2} strokeDasharray="5 5" />
-            )}
-          </LineChart>
-        </ResponsiveContainer>
+        <div className="chart-container">
+          <h4 className="chart-title text-lg font-semibold mb-4">{chart.title}</h4>
+          <ResponsiveContainer width="100%" height={350}>
+            <LineChart data={chart.data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey={chart.data[0].year ? "year" : "name"} style={{ fontSize: '14px' }} />
+              <YAxis style={{ fontSize: '14px' }} />
+              <Tooltip 
+                contentStyle={{ 
+                  fontSize: '14px',
+                  backgroundColor: '#fff',
+                  border: '1px solid #ccc',
+                  borderRadius: '8px'
+                }} 
+              />
+              <Line type="monotone" dataKey={chart.data[0].Brasil ? "Brasil" : "value"} stroke="#8884d8" strokeWidth={3} />
+              {chart.data[0]['Meta ODS'] && (
+                <Line type="monotone" dataKey="Meta ODS" stroke="#ff7300" strokeWidth={2} strokeDasharray="5 5" />
+              )}
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       );
     }
 
     // GRÁFICO DE PIZZA (existente)
     if (chart.type === 'pie') {
       return (
-        <ResponsiveContainer width="100%" height={350}>
-          <PieChart>
-            <Pie
-              data={chart.data}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={120}
-              fill="#8884d8"
-              label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-            >
-              {chart.data.map((entry: any, index: number) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip 
-              contentStyle={{ 
-                fontSize: '14px',
-                backgroundColor: '#fff',
-                border: '1px solid #ccc',
-                borderRadius: '8px'
-              }} 
-            />
-          </PieChart>
-        </ResponsiveContainer>
+        <div className="chart-container">
+          <h4 className="chart-title text-lg font-semibold mb-4">{chart.title}</h4>
+          <ResponsiveContainer width="100%" height={350}>
+            <PieChart>
+              <Pie
+                data={chart.data}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={120}
+                fill="#8884d8"
+                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+              >
+                {chart.data.map((entry: any, index: number) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{ 
+                  fontSize: '14px',
+                  backgroundColor: '#fff',
+                  border: '1px solid #ccc',
+                  borderRadius: '8px'
+                }} 
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       );
     }
 
@@ -832,6 +845,11 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
 
   const generatePDF = async () => {
     try {
+      toast({ title: 'Gerando PDF...', description: 'Processando gráficos e conteúdo. Aguarde...' });
+
+      // Export charts as images first
+      const chartImages = await exportChartsAsImages();
+
       const pdfMakeMod = await import('pdfmake/build/pdfmake');
       const pdfFontsMod = await import('pdfmake/build/vfs_fonts');
       const pdfMakeLocal: any = (pdfMakeMod as any).default ?? (pdfMakeMod as any);
@@ -839,6 +857,19 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
       if (vfs) pdfMakeLocal.vfs = vfs;
 
       const bulletsFromMultiline = (text: string) => text.split('\n').map(s => s.trim()).filter(Boolean);
+
+      const chartContent = chartImages.length > 0 ? [
+        { text: 'Gráficos e Visualizações', style: 'subheader' },
+        ...chartImages.flatMap((chart) => [
+          { text: chart.title, style: 'sectionTitle' },
+          { 
+            image: chart.dataUrl, 
+            width: 500, 
+            margin: [0, 5, 0, 15],
+            alignment: 'center'
+          }
+        ])
+      ] : [];
 
       const docDefinition: any = {
         pageSize: 'A4',
@@ -851,6 +882,8 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
           { text: 'Resumo Executivo', style: 'subheader' },
           ...(analysis.executiveSummary ? [{ text: analysis.executiveSummary, style: 'normal', margin: [0, 0, 0, 10] }] : []),
           ...(data.results?.length ? [{ ul: data.results, style: 'normal', margin: [0, 0, 0, 12] }] : []),
+
+          ...chartContent,
 
           { text: 'Seções Analíticas', style: 'subheader' },
           ...analysis.sections.flatMap((sec) => [
@@ -887,7 +920,25 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
         }),
       };
 
-      pdfMakeLocal.createPdf(docDefinition).download(`relatorio-saude-${Date.now()}.pdf`);
+      const pdf = pdfMakeLocal.createPdf(docDefinition);
+      
+      // Try to open in new tab first, fallback to download
+      try {
+        pdf.getDataUrl((dataUrl: string) => {
+          const newWindow = window.open();
+          if (newWindow) {
+            newWindow.document.write(`
+              <iframe width='100%' height='100%' src='${dataUrl}'></iframe>
+            `);
+          } else {
+            // Fallback to download if popup is blocked
+            pdf.download(`relatorio-saude-${Date.now()}.pdf`);
+          }
+        });
+      } catch (error) {
+        // Final fallback to direct download
+        pdf.download(`relatorio-saude-${Date.now()}.pdf`);
+      }
 
       toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' });
     } catch (error) {
