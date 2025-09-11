@@ -158,7 +158,7 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
       const contentHeightMM = A4.heightMM - A4.marginMM * 2; // 277mm
 
       const cloneWidthPx = Math.round((contentWidthMM / 25.4) * 96); // px @96DPI
-      const scale = 2; // alta qualidade
+      const scale = 3; // resolução alta para impressão nítida
 
       // Monta um template limpo, fora do diálogo/portais para evitar transform/banding
       const printableEl = createPrintableReport(panelData, {
@@ -214,8 +214,11 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
         );
         sliceCanvas.height = sliceHeightPx;
 
-        // minimizar banding nas fatias
-        sliceCtx.imageSmoothingEnabled = false;
+        // preparar fundo branco para evitar transparência e listras
+        sliceCtx.fillStyle = '#ffffff';
+        sliceCtx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+
+        sliceCtx.imageSmoothingEnabled = true;
         sliceCtx.imageSmoothingQuality = 'high';
 
         sliceCtx.drawImage(
@@ -226,10 +229,10 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
           canvas.width, sliceHeightPx
         );
 
-        const imgData = sliceCanvas.toDataURL('image/png', 0.95);
+        const imgData = sliceCanvas.toDataURL('image/jpeg', 0.98);
         const sliceHeightMM = sliceCanvas.height * mmPerPx;
 
-        pdf.addImage(imgData, 'PNG', xPos, yPos, contentWidthMM, sliceHeightMM, undefined, 'MEDIUM');
+        pdf.addImage(imgData, 'JPEG', xPos, yPos, contentWidthMM, sliceHeightMM, undefined, 'SLOW');
       }
 
       const fileName = `Relatorio_${panelData.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;

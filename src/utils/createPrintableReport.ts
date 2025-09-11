@@ -29,7 +29,7 @@ export function createPrintableReport(
     fontFamily: "Arial, sans-serif",
     fontSize: `${baseFontPx}px`,
     lineHeight: "1.65",
-  } as CSSStyleDeclaration);
+  } as any);
 
   const sectionStyle = "margin-bottom: 18px;";
   const h2Style = "font-size: 1.6em; font-weight: 700; margin: 0 0 8px;";
