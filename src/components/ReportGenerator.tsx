@@ -149,42 +149,47 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
 
   const downloadReport = async () => {
     setIsDownloading(true);
-    
+
     try {
-      // Encontrar o elemento do relatório
       const reportElement = document.querySelector('[data-report-content]') as HTMLElement;
       if (!reportElement) {
         throw new Error('Elemento do relatório não encontrado');
       }
 
-      // Configurar html2canvas com configurações otimizadas para impressão
+      // Dimensões A4 e largura alvo em pixels equivalente ao conteúdo (margens inclusas)
+      const A4 = { widthMM: 210, heightMM: 297, marginMM: 15 };
+      const contentWidthMM = A4.widthMM - A4.marginMM * 2; // 180mm
+      const contentHeightMM = A4.heightMM - A4.marginMM * 2; // 267mm
+      const cloneWidthPx = 680; // ~180mm @ 96DPI
+      const scale = 2; // qualidade alta sem gerar arquivo gigante
+
       const canvas = await html2canvas(reportElement, {
-        scale: 1.5, // Qualidade adequada sem exagero
+        scale,
         useCORS: true,
         allowTaint: false,
         backgroundColor: '#ffffff',
         logging: false,
-        width: reportElement.offsetWidth,
-        height: reportElement.offsetHeight,
         onclone: (clonedDoc) => {
-          // Otimizar estilos para PDF
           const clonedElement = clonedDoc.querySelector('[data-report-content]') as HTMLElement;
           if (clonedElement) {
-            clonedElement.style.transform = 'none';
-            clonedElement.style.webkitTransform = 'none';
-            clonedElement.style.position = 'relative';
-            clonedElement.style.overflow = 'visible';
-            clonedElement.style.backgroundColor = '#ffffff';
-            clonedElement.style.fontFamily = 'Arial, sans-serif';
-            clonedElement.style.fontSize = '12px';
-            clonedElement.style.lineHeight = '1.4';
-            clonedElement.style.padding = '20px';
-            clonedElement.style.boxSizing = 'border-box';
+            Object.assign(clonedElement.style, {
+              transform: 'none',
+              WebkitTransform: 'none',
+              position: 'relative',
+              overflow: 'visible',
+              backgroundColor: '#ffffff',
+              fontFamily: 'Arial, sans-serif',
+              fontSize: '14px',
+              lineHeight: '1.6',
+              padding: '24px',
+              boxSizing: 'border-box',
+              width: `${cloneWidthPx}px`,
+              maxWidth: `${cloneWidthPx}px`,
+            } as any);
           }
         }
       });
 
-      // Configurar PDF A4 padrão
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -192,66 +197,39 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
         compress: true
       });
 
-      const pageWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
-      const margin = 15; // 15mm margins
-      const contentWidth = pageWidth - (2 * margin);
-      const contentHeight = pageHeight - (2 * margin);
-      
-      // Converter para image data
-      const imgData = canvas.toDataURL('image/png', 0.95);
-      
-      // Calcular dimensões reais do conteúdo
-      const imgWidthMM = (canvas.width * 25.4) / (96 * 1.5); // Convert pixels to mm considerando o scale
-      const imgHeightMM = (canvas.height * 25.4) / (96 * 1.5);
-      
-      // Calcular escala para caber na página
-      const scaleX = contentWidth / imgWidthMM;
-      const scaleY = contentHeight / imgHeightMM;
-      const scale = Math.min(scaleX, scaleY, 1); // Não aumentar além do tamanho original
-      
-      const finalWidth = imgWidthMM * scale;
-      const finalHeight = imgHeightMM * scale;
-      
-      // Centralizar na página
-      const xPos = (pageWidth - finalWidth) / 2;
-      const yPos = margin;
-      
-      // Verificar se precisa de múltiplas páginas
-      if (finalHeight > contentHeight) {
-        const pagesNeeded = Math.ceil(finalHeight / contentHeight);
-        const heightPerPage = canvas.height / pagesNeeded;
-        
-        for (let page = 0; page < pagesNeeded; page++) {
-          if (page > 0) pdf.addPage();
-          
-          // Criar canvas para esta página
-          const pageCanvas = document.createElement('canvas');
-          const pageCtx = pageCanvas.getContext('2d')!;
-          pageCanvas.width = canvas.width;
-          pageCanvas.height = Math.min(heightPerPage, canvas.height - (page * heightPerPage));
-          
-          // Copiar a seção apropriada
-          pageCtx.drawImage(
-            canvas,
-            0, page * heightPerPage,
-            canvas.width, pageCanvas.height,
-            0, 0,
-            canvas.width, pageCanvas.height
-          );
-          
-          const pageImgData = pageCanvas.toDataURL('image/png', 0.95);
-          const pageHeightMM = (pageCanvas.height * 25.4) / (96 * 1.5);
-          const scaledPageHeight = pageHeightMM * scale;
-          
-          pdf.addImage(pageImgData, 'PNG', xPos, yPos, finalWidth, scaledPageHeight, undefined, 'MEDIUM');
-        }
-      } else {
-        // Conteúdo cabe em uma página
-        pdf.addImage(imgData, 'PNG', xPos, yPos, finalWidth, finalHeight, undefined, 'MEDIUM');
+      const xPos = A4.marginMM;
+      const yPos = A4.marginMM;
+
+      // mm por pixel com base na largura preparada do clone (canvas.width já inclui o scale)
+      const mmPerPx = contentWidthMM / canvas.width;
+      const contentHeightPx = Math.floor(contentHeightMM / mmPerPx);
+
+      const totalPages = Math.ceil(canvas.height / contentHeightPx);
+
+      for (let page = 0; page < totalPages; page++) {
+        if (page > 0) pdf.addPage();
+
+        // Criar fatia da página sem subpixels para evitar faixas
+        const sliceCanvas = document.createElement('canvas');
+        const sliceCtx = sliceCanvas.getContext('2d')!;
+        sliceCanvas.width = canvas.width;
+        const sliceHeightPx = Math.min(contentHeightPx, canvas.height - page * contentHeightPx);
+        sliceCanvas.height = sliceHeightPx;
+
+        sliceCtx.drawImage(
+          canvas,
+          0, page * contentHeightPx,
+          canvas.width, sliceHeightPx,
+          0, 0,
+          canvas.width, sliceHeightPx
+        );
+
+        const imgData = sliceCanvas.toDataURL('image/png', 0.95);
+        const sliceHeightMM = sliceCanvas.height * mmPerPx;
+
+        pdf.addImage(imgData, 'PNG', xPos, yPos, contentWidthMM, sliceHeightMM, undefined, 'MEDIUM');
       }
-      
-      // Salvar o PDF
+
       const fileName = `Relatorio_${panelData.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
       pdf.save(fileName);
 
