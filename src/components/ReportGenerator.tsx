@@ -192,26 +192,19 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
       const fileName = `Relatorio_${panelData.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
 
       const pdfMakeMod = await import('pdfmake/build/pdfmake');
-      const pdfFontsMod = await import('pdfmake/build/vfs_fonts');
-      const pdfMakeLocal: any = (pdfMakeMod as any).default ?? (pdfMakeMod as any);
-      const vfs = (pdfFontsMod as any).vfs ?? (pdfFontsMod as any).pdfMake?.vfs;
-      if (vfs) pdfMakeLocal.vfs = vfs;
-
-     // PDF functionality temporarily disabled
-toast({
-  title: "Funcionalidade em desenvolvimento", 
-  description: "A geração de PDF será implementada em breve. Use Ctrl+P para imprimir.",
-});
-window.print();
-        } catch (error) {
+           // PDF functionality temporarily disabled
+      toast({
+        title: "Funcionalidade em desenvolvimento", 
+        description: "A geração de PDF será implementada em breve. Use Ctrl+P para imprimir.",
+      });
+      window.print();
+    } catch (error) {
       console.error('Erro ao gerar PDF:', error);
-      try {
-        toast({
-          title: 'Erro',
-          description: 'Não foi possível gerar o PDF. Tente novamente.',
-          variant: 'destructive',
-        });
-      } catch {}
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível gerar o PDF. Tente novamente.',
+        variant: 'destructive',
+      });
     } finally {
       setIsDownloading(false);
     }
