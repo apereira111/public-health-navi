@@ -934,38 +934,28 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
           }),
         };
 
-        const pdf = pdfMakeLocal.createPdf(docDefinition);
-        const fileName = `relatorio-saude-${Date.now()}.pdf`;
-        
-        try {
-          const blob: Blob = await new Promise((resolve, reject) => {
-            try {
-              pdf.getBlob((b: Blob) => {
-                try {
-                  resolve(b);
-                } catch (e) {
-                  reject(e);
-                }
-              });
-            } catch (e) {
-              reject(e);
-            }
-          });
-          saveAs(blob, fileName);
-          console.log('HealthReport:generatePDF:saveAs:success');
-          try { toast({ title: 'PDF Gerado', description: 'O relatório foi exportado com sucesso!' }); } catch {}
-        } catch (e) {
-          console.error('HealthReport:generatePDF:getBlob:error', e);
-          try { toast({ title: 'Erro', description: 'Erro ao gerar o PDF. Tente novamente.', variant: 'destructive' }); } catch {}
-        } finally {
-          setIsGeneratingPdf(false);
-        }
+             // PDF functionality temporarily disabled - use browser print instead
+        console.log('HealthReport: Using browser print instead of PDF generation');
+        window.print();
+        setIsGeneratingPdf(false);
+        try { 
+          toast({ 
+            title: 'Funcionalidade em desenvolvimento', 
+            description: 'Use Ctrl+P ou Cmd+P para imprimir o relatório. PDF será implementado em breve.' 
+          }); 
+        } catch {}
 
       } catch (error) {
-        console.error('Erro ao gerar PDF:', error);
+        console.error('Erro ao preparar relatório:', error);
         setIsGeneratingPdf(false);
-        try { toast({ title: 'Erro', description: 'Erro ao gerar o PDF. Tente novamente.', variant: 'destructive' }); } catch {}
-      }
+        try { 
+          toast({ 
+            title: 'Erro', 
+            description: 'Erro ao preparar o relatório. Tente novamente.', 
+            variant: 'destructive' 
+          }); 
+        } catch {}
+      } 
     });
   };
 
