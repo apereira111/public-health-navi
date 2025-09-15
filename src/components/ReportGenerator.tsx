@@ -197,27 +197,13 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
       const vfs = (pdfFontsMod as any).vfs ?? (pdfFontsMod as any).pdfMake?.vfs;
       if (vfs) pdfMakeLocal.vfs = vfs;
 
-      const pdf = pdfMakeLocal.createPdf(docDefinition);
-      const blob: Blob = await new Promise((resolve, reject) => {
-        try {
-          pdf.getBlob((b: Blob) => {
-            try { resolve(b); } catch (e) { reject(e); }
-          });
-        } catch (e) {
-          reject(e);
-        }
-      });
-
-      saveAs(blob, fileName);
-
-      try {
-        toast({
-          title: 'PDF Gerado com Sucesso!',
-          description: 'Seu relatório foi baixado em alta qualidade.',
-        });
-      } catch {}
-
-    } catch (error) {
+     // PDF functionality temporarily disabled
+toast({
+  title: "Funcionalidade em desenvolvimento", 
+  description: "A geração de PDF será implementada em breve. Use Ctrl+P para imprimir.",
+});
+window.print();
+        } catch (error) {
       console.error('Erro ao gerar PDF:', error);
       try {
         toast({
