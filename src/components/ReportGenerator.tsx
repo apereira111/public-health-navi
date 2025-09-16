@@ -8,7 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import type { PanelData } from "@/types";
-import { saveAs } from 'file-saver';
 
 interface ReportGeneratorProps {
   panelData: PanelData;
@@ -17,7 +16,6 @@ interface ReportGeneratorProps {
 export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -146,70 +144,6 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
     }
   };
 
-  const downloadReport = async () => {
-    setIsDownloading(true);
-
-    try {
-      const executiveSummary = generateExecutiveSummary();
-      const insights = generateInsights();
-      const recommendations = generateRecommendations();
-
-      const docDefinition: any = {
-        pageSize: 'A4',
-        pageMargins: [20, 24, 20, 28],
-        content: [
-          { text: `Relatório Executivo - ${panelData.title}`, style: 'header' },
-          { text: `${currentDate}`, style: 'meta', margin: [0, 0, 0, 8] },
-          { text: `${panelData.description}`, style: 'normal', margin: [0, 0, 0, 12] },
-
-          { text: 'Resumo Executivo', style: 'subheader' },
-          { text: `${executiveSummary}`, style: 'normal', margin: [0, 0, 0, 12] },
-
-          { text: 'Indicadores Principais', style: 'subheader' },
-          { ul: panelData.kpis.map(kpi => `${kpi.title}: ${kpi.value} — ${kpi.change} ${kpi.changeType === 'increase' ? '(↑)' : '(↓)'}`), style: 'normal', margin: [0, 0, 0, 12] },
-
-          { text: 'Insights e Análises', style: 'subheader' },
-          { ul: insights, style: 'normal', margin: [0, 0, 0, 12] },
-
-          { text: 'Recomendações', style: 'subheader' },
-          { ul: recommendations, style: 'normal' },
-        ],
-        styles: {
-          header: { fontSize: 20, bold: true, margin: [0, 0, 0, 8] },
-          subheader: { fontSize: 15, bold: true, color: '#111', margin: [0, 10, 0, 6] },
-          normal: { fontSize: 12, lineHeight: 1.4, color: '#000' },
-          meta: { fontSize: 10, color: '#555' },
-        },
-        defaultStyle: {
-          font: 'Roboto',
-        },
-        footer: (currentPage: number, pageCount: number) => ({
-          text: `Página ${currentPage} de ${pageCount}`,
-          alignment: 'right', margin: [0, 8, 20, 0], fontSize: 9, color: '#666'
-        }),
-      };
-
-      const fileName = `Relatorio_${panelData.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
-
-      const pdfMakeMod = await import('pdfmake/build/pdfmake');
-           // PDF functionality temporarily disabled
-      toast({
-        title: "Funcionalidade em desenvolvimento", 
-        description: "A geração de PDF será implementada em breve. Use Ctrl+P para imprimir.",
-      });
-      window.print();
-    } catch (error) {
-      console.error('Erro ao gerar PDF:', error);
-      toast({
-        title: 'Erro',
-        description: 'Não foi possível gerar o PDF. Tente novamente.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -226,7 +160,7 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-6" data-report-content>
+        <div className="space-y-6">
           {/* Header do Relatório */}
           <Card className="p-6 bg-accent/5">
             <div className="flex items-center justify-between mb-4">
@@ -319,14 +253,9 @@ export const ReportGenerator = ({ panelData }: ReportGeneratorProps) => {
               <Save className="h-4 w-4" />
               {isSaving ? "Salvando..." : "Salvar Relatório"}
             </Button>
-            <Button 
-              onClick={downloadReport}
-              disabled={isDownloading}
-              variant="professional" 
-              className="gap-2"
-            >
+            <Button variant="professional" className="gap-2">
               <Download className="h-4 w-4" />
-              {isDownloading ? "Gerando PDF..." : "Baixar Relatório"}
+              Baixar Relatório
             </Button>
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               Fechar

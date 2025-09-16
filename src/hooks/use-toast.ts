@@ -134,63 +134,21 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">;
 
-// Sanitiza valores para evitar objetos sendo passados para o toast
-const sanitizeToastValue = (value: any): string | undefined => {
-  if (value === null || value === undefined) return undefined;
-  if (typeof value === "string") return value;
-  if (typeof value === "number" || typeof value === "boolean") return String(value);
-  // Se for objeto, converte para string segura
-  if (typeof value === "object") {
-    try {
-      return JSON.stringify(value);
-    } catch {
-      return "[Object]";
-    }
-  }
-  return String(value);
-};
-
 function toast({ ...props }: Toast) {
   const id = genId();
 
-  // Sanitiza title e description antes de criar o toast
-  const sanitizedProps = {
-    ...props,
-    title: props.title ? sanitizeToastValue(props.title) : undefined,
-    description: props.description ? sanitizeToastValue(props.description) : undefined,
-  };
-  try {
-    console.debug("[toast] create", {
-      variant: (sanitizedProps as any).variant,
-      titleType: typeof sanitizedProps.title,
-      descriptionType: typeof sanitizedProps.description,
-    });
-  } catch {}
-
-  const safeAction = props.action && React.isValidElement(props.action) ? props.action : undefined;
-
-  const update = (next: ToasterToast) =>
+  const update = (props: ToasterToast) =>
     dispatch({
       type: "UPDATE_TOAST",
-      toast: {
-        id,
-        variant: next.variant,
-        title: sanitizeToastValue(next.title),
-        description: sanitizeToastValue(next.description),
-        action: next.action && React.isValidElement(next.action) ? next.action : undefined,
-        open: next.open,
-      },
+      toast: { ...props, id },
     });
   const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
 
   dispatch({
     type: "ADD_TOAST",
     toast: {
+      ...props,
       id,
-      variant: (sanitizedProps as any).variant,
-      title: sanitizedProps.title,
-      description: sanitizedProps.description,
-      action: safeAction,
       open: true,
       onOpenChange: (open) => {
         if (!open) dismiss();

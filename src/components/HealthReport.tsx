@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import { useToast } from '@/hooks/use-toast';
-import { exportChartsAsImages } from '@/utils/chartExporter';
-import { saveAs } from 'file-saver';
 
 interface ReportData {
   query: string;
@@ -179,7 +179,6 @@ const generateGenericAnalysis = (panelType: string): AnalysisResult => {
 
 export const HealthReport: React.FC<HealthReportProps> = ({ data, onClose }) => {
   const { toast } = useToast();
-  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const generateChartData = (query: string) => {
     const lowercaseQuery = query.toLowerCase();
@@ -491,8 +490,7 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
     // GRÁFICO DE CORRELAÇÃO (SCATTER PLOT)
     if (chart.type === 'correlation_scatter') {
       return (
-        <div className="w-full chart-container">
-          <h4 className="chart-title text-lg font-semibold mb-4">{chart.title}</h4>
+        <div>
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={chart.data} margin={{ top: 20, right: 30, left: 40, bottom: 60 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -554,125 +552,113 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
       const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300'];
       
       return (
-        <div className="chart-container">
-          <h4 className="chart-title text-lg font-semibold mb-4">{chart.title}</h4>
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={chart.data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="year" style={{ fontSize: '14px' }} />
-              <YAxis yAxisId="left" style={{ fontSize: '14px' }} />
-              <YAxis yAxisId="right" orientation="right" style={{ fontSize: '14px' }} />
-              <Tooltip 
-                contentStyle={{ 
-                  fontSize: '14px',
-                  backgroundColor: '#fff',
-                  border: '1px solid #ccc',
-                  borderRadius: '8px'
-                }} 
+        <ResponsiveContainer width="100%" height={400}>
+          <LineChart data={chart.data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="year" style={{ fontSize: '14px' }} />
+            <YAxis yAxisId="left" style={{ fontSize: '14px' }} />
+            <YAxis yAxisId="right" orientation="right" style={{ fontSize: '14px' }} />
+            <Tooltip 
+              contentStyle={{ 
+                fontSize: '14px',
+                backgroundColor: '#fff',
+                border: '1px solid #ccc',
+                borderRadius: '8px'
+              }} 
+            />
+            {dataKeys.map((key, index) => (
+              <Line 
+                key={key}
+                yAxisId={index === 0 ? "left" : "right"}
+                type="monotone" 
+                dataKey={key} 
+                stroke={colors[index % colors.length]} 
+                strokeWidth={3}
+                dot={{ r: 4 }}
+                name={key.charAt(0).toUpperCase() + key.slice(1)}
               />
-              {dataKeys.map((key, index) => (
-                <Line 
-                  key={key}
-                  yAxisId={index === 0 ? "left" : "right"}
-                  type="monotone" 
-                  dataKey={key} 
-                  stroke={colors[index % colors.length]} 
-                  strokeWidth={3}
-                  dot={{ r: 4 }}
-                  name={key.charAt(0).toUpperCase() + key.slice(1)}
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
       );
     }
 
     // GRÁFICO DE BARRAS (existente)
     if (chart.type === 'bar') {
       return (
-        <div className="chart-container">
-          <h4 className="chart-title text-lg font-semibold mb-4">{chart.title}</h4>
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={chart.data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" style={{ fontSize: '14px' }} />
-              <YAxis style={{ fontSize: '14px' }} />
-              <Tooltip 
-                contentStyle={{ 
-                  fontSize: '14px',
-                  backgroundColor: '#fff',
-                  border: '1px solid #ccc',
-                  borderRadius: '8px'
-                }} 
-              />
-              <Bar dataKey="value" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart data={chart.data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" style={{ fontSize: '14px' }} />
+            <YAxis style={{ fontSize: '14px' }} />
+            <Tooltip 
+              contentStyle={{ 
+                fontSize: '14px',
+                backgroundColor: '#fff',
+                border: '1px solid #ccc',
+                borderRadius: '8px'
+              }} 
+            />
+            <Bar dataKey="value" fill="#8884d8" />
+          </BarChart>
+        </ResponsiveContainer>
       );
     }
 
     // GRÁFICO DE LINHA SIMPLES (existente)
     if (chart.type === 'line') {
       return (
-        <div className="chart-container">
-          <h4 className="chart-title text-lg font-semibold mb-4">{chart.title}</h4>
-          <ResponsiveContainer width="100%" height={350}>
-            <LineChart data={chart.data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey={chart.data[0].year ? "year" : "name"} style={{ fontSize: '14px' }} />
-              <YAxis style={{ fontSize: '14px' }} />
-              <Tooltip 
-                contentStyle={{ 
-                  fontSize: '14px',
-                  backgroundColor: '#fff',
-                  border: '1px solid #ccc',
-                  borderRadius: '8px'
-                }} 
-              />
-              <Line type="monotone" dataKey={chart.data[0].Brasil ? "Brasil" : "value"} stroke="#8884d8" strokeWidth={3} />
-              {chart.data[0]['Meta ODS'] && (
-                <Line type="monotone" dataKey="Meta ODS" stroke="#ff7300" strokeWidth={2} strokeDasharray="5 5" />
-              )}
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        <ResponsiveContainer width="100%" height={350}>
+          <LineChart data={chart.data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey={chart.data[0].year ? "year" : "name"} style={{ fontSize: '14px' }} />
+            <YAxis style={{ fontSize: '14px' }} />
+            <Tooltip 
+              contentStyle={{ 
+                fontSize: '14px',
+                backgroundColor: '#fff',
+                border: '1px solid #ccc',
+                borderRadius: '8px'
+              }} 
+            />
+            <Line type="monotone" dataKey={chart.data[0].Brasil ? "Brasil" : "value"} stroke="#8884d8" strokeWidth={3} />
+            {chart.data[0]['Meta ODS'] && (
+              <Line type="monotone" dataKey="Meta ODS" stroke="#ff7300" strokeWidth={2} strokeDasharray="5 5" />
+            )}
+          </LineChart>
+        </ResponsiveContainer>
       );
     }
 
     // GRÁFICO DE PIZZA (existente)
     if (chart.type === 'pie') {
       return (
-        <div className="chart-container">
-          <h4 className="chart-title text-lg font-semibold mb-4">{chart.title}</h4>
-          <ResponsiveContainer width="100%" height={350}>
-            <PieChart>
-              <Pie
-                data={chart.data}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={120}
-                fill="#8884d8"
-                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-              >
-                {chart.data.map((entry: any, index: number) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{ 
-                  fontSize: '14px',
-                  backgroundColor: '#fff',
-                  border: '1px solid #ccc',
-                  borderRadius: '8px'
-                }} 
-              />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+        <ResponsiveContainer width="100%" height={350}>
+          <PieChart>
+            <Pie
+              data={chart.data}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={120}
+              fill="#8884d8"
+              label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+            >
+              {chart.data.map((entry: any, index: number) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip 
+              contentStyle={{ 
+                fontSize: '14px',
+                backgroundColor: '#fff',
+                border: '1px solid #ccc',
+                borderRadius: '8px'
+              }} 
+            />
+          </PieChart>
+        </ResponsiveContainer>
       );
     }
 
@@ -847,116 +833,92 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
   };
 
   const generatePDF = async () => {
-    if (isGeneratingPdf) return;
-    
-    setIsGeneratingPdf(true);
-    console.log('HealthReport:generatePDF:start');
-    // (removido) Toast de progresso durante geração do PDF para evitar objetos inválidos em UI
+    try {
+      const element = document.getElementById('health-report');
+      if (!element) return;
 
-    // Use requestAnimationFrame to ensure UI updates before heavy processing
-    requestAnimationFrame(async () => {
-      try {
-        let chartImages: any[] = [];
-        try {
-          chartImages = await exportChartsAsImages();
-        } catch (e) {
-          console.error('HealthReport:exportChartsAsImages:error', e);
-          chartImages = [];
+      const canvasScale = 2; // Scale factor for better quality
+      const canvas = await html2canvas(element, { 
+        scale: canvasScale,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: '#ffffff',
+        height: element.scrollHeight,
+        width: element.scrollWidth,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight
+      });
+      
+      const imgData = canvas.toDataURL('image/png', 1.0); // Maximum quality
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      
+      // Calculate proper scaling to fill the page width with margins
+      const margin = 10; // 10mm margin
+      const availableWidth = pdfWidth - (margin * 2);
+      const availableHeight = pdfHeight - (margin * 2);
+      
+      const widthRatio = availableWidth / (imgWidth / canvasScale);
+      const heightRatio = availableHeight / (imgHeight / canvasScale);
+      const ratio = Math.min(widthRatio, heightRatio);
+      
+      const scaledWidth = (imgWidth / canvasScale) * ratio;
+      const scaledHeight = (imgHeight / canvasScale) * ratio;
+      
+      const imgX = margin + (availableWidth - scaledWidth) / 2;
+      const imgY = margin;
+
+      // Se o conteúdo for muito alto, dividir em páginas
+      if (scaledHeight > availableHeight) {
+        let position = 0;
+        const pageHeight = availableHeight / ratio * canvasScale;
+        
+        while (position < imgHeight) {
+          const pageCanvas = document.createElement('canvas');
+          pageCanvas.width = imgWidth;
+          pageCanvas.height = Math.min(pageHeight, imgHeight - position);
+          
+          const pageCtx = pageCanvas.getContext('2d');
+          if (pageCtx) {
+            pageCtx.drawImage(canvas, 0, position, imgWidth, pageCanvas.height, 0, 0, imgWidth, pageCanvas.height);
+            const pageImgData = pageCanvas.toDataURL('image/png', 1.0);
+            
+            if (position > 0) pdf.addPage();
+            
+            const pageScaledHeight = (pageCanvas.height / canvasScale) * ratio;
+            pdf.addImage(pageImgData, 'PNG', imgX, imgY, scaledWidth, pageScaledHeight);
+          }
+          
+          position += pageHeight;
         }
-
-        const pdfMakeMod = await import('pdfmake/build/pdfmake');
-        const pdfFontsMod = await import('pdfmake/build/vfs_fonts');
-        const pdfMakeLocal: any = (pdfMakeMod as any).default ?? (pdfMakeMod as any);
-        const vfs = (pdfFontsMod as any).vfs ?? (pdfFontsMod as any).pdfMake?.vfs;
-        if (vfs) pdfMakeLocal.vfs = vfs;
-
-        const bulletsFromMultiline = (text: string) => text.split('\n').map(s => s.trim()).filter(Boolean);
-
-        const chartContent = chartImages.length > 0 ? [
-          { text: 'Gráficos e Visualizações', style: 'subheader' },
-          ...chartImages.flatMap((chart) => [
-            { text: chart.title, style: 'sectionTitle' },
-            { 
-              image: chart.dataUrl, 
-              width: 500, 
-              margin: [0, 5, 0, 15],
-              alignment: 'center'
-            }
-          ])
-        ] : [];
-
-        const docDefinition: any = {
-          pageSize: 'A4',
-          pageMargins: [20, 24, 20, 28],
-          content: [
-            { text: 'Relatório de Indicadores de Saúde', style: 'header' },
-            { text: `Consulta: "${data.query}"`, style: 'meta' },
-            { text: `Gerado em: ${new Date(data.timestamp).toLocaleString('pt-BR')}`, style: 'meta', margin: [0, 0, 0, 8] },
-
-            { text: 'Resumo Executivo', style: 'subheader' },
-            ...(analysis.executiveSummary ? [{ text: analysis.executiveSummary, style: 'normal', margin: [0, 0, 0, 10] }] : []),
-            ...(data.results?.length ? [{ ul: data.results, style: 'normal', margin: [0, 0, 0, 12] }] : []),
-
-            ...chartContent,
-
-            { text: 'Seções Analíticas', style: 'subheader' },
-            ...analysis.sections.flatMap((sec) => [
-              { text: sec.title, style: 'sectionTitle' },
-              { text: sec.content, style: 'normal', margin: [0, 0, 0, 8] },
-            ]),
-
-            ...(analysis.recommendations?.length ? [
-              { text: 'Recomendações Prioritárias', style: 'subheader' },
-              { ul: analysis.recommendations.map(r => `${r.priority}: ${r.action} — Prazo: ${r.timeline} — Investimento: ${r.investment} — Responsável: ${r.responsible} — Impacto: ${r.expectedImpact}`), style: 'normal', margin: [0, 0, 0, 12] },
-            ] : []),
-
-            { text: definitions.title, style: 'subheader' },
-            { ul: bulletsFromMultiline(definitions.content), style: 'normal', margin: [0, 0, 0, 12] },
-
-            { text: 'Conclusões', style: 'subheader' },
-            { ul: [
-              `Pontos Positivos: ${conclusions.positive}`,
-              `Desafios: ${conclusions.challenges}`,
-              `Próximos Passos: ${conclusions.nextSteps}`,
-            ], style: 'normal' },
-          ],
-          styles: {
-            header: { fontSize: 22, bold: true, margin: [0, 0, 0, 8] },
-            subheader: { fontSize: 16, bold: true, color: '#111', margin: [0, 10, 0, 6] },
-            sectionTitle: { fontSize: 14, bold: true, margin: [0, 6, 0, 4] },
-            normal: { fontSize: 13.5, lineHeight: 1.45, color: '#000' },
-            meta: { fontSize: 10.5, color: '#555' },
-          },
-          defaultStyle: { font: 'Roboto' },
-          footer: (currentPage: number, pageCount: number) => ({
-            text: `Página ${currentPage} de ${pageCount}`,
-            alignment: 'right', margin: [0, 8, 20, 0], fontSize: 9, color: '#666'
-          }),
-        };
-
-             // PDF functionality temporarily disabled - use browser print instead
-        console.log('HealthReport: Using browser print instead of PDF generation');
-        window.print();
-        setIsGeneratingPdf(false);
-        try { 
-          toast({ 
-            title: 'Funcionalidade em desenvolvimento', 
-            description: 'Use Ctrl+P ou Cmd+P para imprimir o relatório. PDF será implementado em breve.' 
-          }); 
-        } catch {}
-
-      } catch (error) {
-        console.error('Erro ao preparar relatório:', error);
-        setIsGeneratingPdf(false);
-        try { 
-          toast({ 
-            title: 'Erro', 
-            description: 'Erro ao preparar o relatório. Tente novamente.', 
-            variant: 'destructive' 
-          }); 
-        } catch {}
-      } 
-    });
+      } else {
+        pdf.addImage(imgData, 'PNG', imgX, imgY, scaledWidth, scaledHeight);
+      }
+      
+      pdf.save(`relatorio-saude-${new Date().getTime()}.pdf`);
+      toast({
+        title: "PDF Gerado",
+        description: "O relatório foi exportado com sucesso!"
+      });
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao gerar o PDF. Tente novamente.",
+        variant: "destructive"
+      });
+    }
   };
 
   const definitions = generateDefinitions(data.query);
@@ -969,25 +931,10 @@ Interpretação: serviços especializados permitem abordagens diferenciadas para
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Relatório de Saúde</h2>
             <div className="flex gap-2">
-              <Button 
-                type="button"
-                onClick={generatePDF} 
-                variant="outline"
-                disabled={isGeneratingPdf}
-                className={isGeneratingPdf ? "bg-blue-100 text-blue-700 border-blue-300" : ""}
-              >
-                {isGeneratingPdf ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-                    Gerando PDF...
-                  </>
-                ) : (
-                  <>
-                    📄 Exportar PDF
-                  </>
-                )}
+              <Button onClick={generatePDF} variant="outline">
+                📄 Exportar PDF
               </Button>
-              <Button type="button" onClick={() => { console.log('HealthReport:onClose:click'); onClose(); }} variant="outline">
+              <Button onClick={onClose} variant="outline">
                 ✕ Fechar
               </Button>
             </div>
