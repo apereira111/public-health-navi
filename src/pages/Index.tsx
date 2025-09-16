@@ -7,6 +7,8 @@ import { Reports } from "@/components/Reports";
 import { DataCollector } from "@/components/DataCollector";
 
 const Index = () => {
+  console.log("🏠 Index.tsx: Rendering Index page");
+  
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
